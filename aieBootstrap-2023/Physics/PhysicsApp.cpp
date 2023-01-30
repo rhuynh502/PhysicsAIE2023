@@ -120,8 +120,8 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->AddActor(ball1);
 	m_physicsScene->AddActor(ball2);
 
-	ball1->ApplyForce(glm::vec2(30, 0));
-	ball2->ApplyForce(glm::vec2(-15, 0));
+	ball1->ApplyForce(glm::vec2(5, 0));
+	ball2->ApplyForce(glm::vec2(-3, 0));
 #endif // Simulating Collision
 
 }
