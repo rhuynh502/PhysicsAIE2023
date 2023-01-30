@@ -54,6 +54,21 @@ void PhysicsApp::update(float deltaTime) {
 
 	DemoUpdate(input, deltaTime);
 
+#ifdef SimulatingRocket
+
+	if (m_rocket->GetMass() > 1 && m_timer > 10)
+	{
+		Circle* fuel = new Circle(m_rocket->GetPos() - glm::vec2(0, m_rocket->GetRadius() + 0.5f), glm::vec2(0),
+			0.5f, .5f, glm::vec4(0, 1, 0, 1));
+		m_physicsScene->AddActor(fuel);
+		m_rocket->SetMass(m_rocket->GetMass() - fuel->GetMass());
+
+		fuel->ApplyForceToActor(m_rocket, glm::vec2(0.1f, -3.f));
+		m_timer = 0;
+	}
+	m_timer++;
+#endif
+
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -124,6 +139,15 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	ball2->ApplyForce(glm::vec2(-3, 0));
 #endif // Simulating Collision
 
+#ifdef SimulatingRocket
+	m_physicsScene->SetGravity(glm::vec2(0, -9.8f));
+
+	m_rocket = new Circle(glm::vec2(0, 0), glm::vec2(0, 0),
+		100.f, 9, glm::vec4(1, 0, 1, 1));
+
+	m_physicsScene->AddActor(m_rocket);
+	m_timer = 0;
+#endif // Simulating Rocket
 }
 
 void PhysicsApp::DemoUpdate(aie::Input* _input, float _dt)

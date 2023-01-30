@@ -3,6 +3,8 @@
 #include "Application.h"
 #include "Renderer2D.h"
 #include "Input.h"
+#include "Demos.h"
+#include "Circle.h"
 #include <vector>
 
 class PhysicsScene;
@@ -34,4 +36,8 @@ public:
 	void DemoUpdate(aie::Input* _input, float _dt);
 	float DegreesToRadians(float _degrees);
 
+#ifdef SimulatingRocket
+	Circle* m_rocket;
+	int m_timer;
+#endif
 };

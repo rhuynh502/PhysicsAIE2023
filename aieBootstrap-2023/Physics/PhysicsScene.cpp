@@ -1,5 +1,6 @@
 #include "PhysicsScene.h"
 #include "Circle.h"
+#include "Demos.h"
 
 PhysicsScene::PhysicsScene()
 {
@@ -52,6 +53,7 @@ void PhysicsScene::Update(float _dt)
 		}
 		accumulatedTime -= m_timeStep;
 
+#ifndef SimulatingRocket
 		int actorCount = m_actors.size();
 
 		for (int outer = 0; outer < actorCount - 1; outer++)
@@ -64,6 +66,8 @@ void PhysicsScene::Update(float _dt)
 				Circle2Circle(obj1, obj2);
 			}
 		}
+#endif // !SimulatingRocket
+
 	}
 }
 
