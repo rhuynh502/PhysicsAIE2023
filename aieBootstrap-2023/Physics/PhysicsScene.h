@@ -28,6 +28,8 @@ public:
 	void SetTimeStep(const float _timeStep)
 		{ m_timeStep = _timeStep; }
 
+	static bool Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);
+
 private:
 	glm::vec2 m_gravity;
 	float m_timeStep;

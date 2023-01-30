@@ -3,6 +3,8 @@
 #include "Font.h"
 #include "Input.h"
 #include "Gizmos.h"
+#include "Demos.h"
+#include "Circle.h"
 
 #include "PhysicsScene.h"
 
@@ -27,8 +29,9 @@ bool PhysicsApp::startup() {
 	m_font = new aie::Font("../bin/font/consolas.ttf", 32);
 
 	m_physicsScene = new PhysicsScene();
-	m_physicsScene->SetGravity(glm::vec2(0));
 	m_physicsScene->SetTimeStep(0.01);
+
+	DemoStartUp(1);
 
 	return true;
 }
@@ -48,6 +51,8 @@ void PhysicsApp::update(float deltaTime) {
 
 	m_physicsScene->Update(deltaTime);
 	m_physicsScene->Draw();
+
+	DemoUpdate(input, deltaTime);
 
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
@@ -72,4 +77,50 @@ void PhysicsApp::draw() {
 
 	// done drawing sprites
 	m_2dRenderer->end();
+}
+
+void PhysicsApp::DemoStartUp(int _demoNumber)
+{
+#ifdef NewtonsFirstLaw
+	m_physicsScene->SetGravity(glm::vec2(0, 0));
+	Circle* ball = new Circle(glm::vec2(-40, 0), glm::vec2(10, 30), 
+		3.f, 1, glm::vec4(1, 0, 1, 1));
+	m_physicsScene->AddActor(ball);
+#endif // Newtons first law
+
+#ifdef NewtonsSecondLaw
+	m_physicsScene->SetGravity(glm::vec2(0, -9.8));
+	Circle* ball = new Circle(glm::vec2(-40, 0), glm::vec2(10, 30),
+		3.f, 1, glm::vec4(1, 0, 1, 1));
+	m_physicsScene->AddActor(ball);
+#endif // Newtons second law
+
+#ifdef NewtonsThirdLaw
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	Circle* ball1 = new Circle(glm::vec2(-4, 0), glm::vec2(0, 0),
+		4.0f, 4, glm::vec4(1, 0, 0, 1));
+	Circle* ball2 = new Circle(glm::vec2(4, 0), glm::vec2(0, 0),
+		4.0f, 4, glm::vec4(1, 0, 1, 1));
+
+	m_physicsScene->AddActor(ball1);
+	m_physicsScene->AddActor(ball2);
+
+	ball1->ApplyForceToActor(ball2, glm::vec2(-2, 0));
+#endif // Newtons third law
+
+}
+
+void PhysicsApp::DemoUpdate(aie::Input* _input, float _dt)
+{
+#ifdef NewtonsThirdLaw
+	if (_input->isKeyDown(aie::INPUT_KEY_SPACE))
+	{
+	}
+#endif // Newtons third law
+}
+
+float PhysicsApp::DegreesToRadians(float _degrees)
+{
+	return _degrees * (PI / 180.f);
 }

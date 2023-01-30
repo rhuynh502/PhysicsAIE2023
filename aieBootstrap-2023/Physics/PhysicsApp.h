@@ -2,6 +2,7 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
+#include "Input.h"
 #include <vector>
 
 class PhysicsScene;
@@ -27,4 +28,10 @@ protected:
 	PhysicsScene* m_physicsScene;
 
 	std::vector<PhysicsObject*> m_objects;
+
+public:
+	void DemoStartUp(int _demoNumber);
+	void DemoUpdate(aie::Input* _input, float _dt);
+	float DegreesToRadians(float _degrees);
+
 };
