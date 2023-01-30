@@ -84,10 +84,14 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 	// if successful, test for collision
 	if (circ1 != nullptr && circ2 != nullptr)
 	{
-		if(glm::distance(circ1->GetPos(), circ2->GetPos()) 
+		if (glm::distance(circ1->GetPos(), circ2->GetPos())
 			<= circ1->GetRadius() + circ2->GetRadius())
-		circ1->SetVel(glm::vec2(0));
-		circ2->SetVel(glm::vec2(0));
+		{
+
+
+			circ1->SetVel(glm::vec2(0));
+			circ2->SetVel(glm::vec2(0));
+		}
 	}
 
 	return false;

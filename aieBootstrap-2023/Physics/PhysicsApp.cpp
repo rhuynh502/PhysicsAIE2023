@@ -109,6 +109,21 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	ball1->ApplyForceToActor(ball2, glm::vec2(-2, 0));
 #endif // Newtons third law
 
+#ifdef SimulatingCollision
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	Circle* ball1 = new Circle(glm::vec2(-20, 0), glm::vec2(0, 0),
+		4.0f, 4, glm::vec4(1, 0, 0, 1));
+	Circle* ball2 = new Circle(glm::vec2(10, 0), glm::vec2(0, 0),
+		4.0f, 4, glm::vec4(1, 0, 1, 1));
+
+	m_physicsScene->AddActor(ball1);
+	m_physicsScene->AddActor(ball2);
+
+	ball1->ApplyForce(glm::vec2(30, 0));
+	ball2->ApplyForce(glm::vec2(-15, 0));
+#endif // Simulating Collision
+
 }
 
 void PhysicsApp::DemoUpdate(aie::Input* _input, float _dt)
