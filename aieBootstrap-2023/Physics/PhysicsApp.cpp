@@ -5,6 +5,7 @@
 #include "Gizmos.h"
 #include "Demos.h"
 #include "Circle.h"
+#include "Plane.h"
 
 #include "PhysicsScene.h"
 
@@ -56,16 +57,20 @@ void PhysicsApp::update(float deltaTime) {
 
 #ifdef SimulatingRocket
 
-	if (m_rocket->GetMass() > 1 && m_timer > 10)
+	if (input->isKeyDown(aie::INPUT_KEY_W) && m_rocket->GetMass() > 15 && m_timer > 1)
 	{
-		Circle* fuel = new Circle(m_rocket->GetPos() - glm::vec2(0, m_rocket->GetRadius() + 0.5f), glm::vec2(0),
-			0.5f, .5f, glm::vec4(0, 1, 0, 1));
-		m_physicsScene->AddActor(fuel);
-		m_rocket->SetMass(m_rocket->GetMass() - fuel->GetMass());
-
-		fuel->ApplyForceToActor(m_rocket, glm::vec2(0.1f, -3.f));
-		m_timer = 0;
+		GetFuel();
+		
 	}
+	if (input->isKeyDown(aie::INPUT_KEY_A))
+	{
+		m_rocket->SetOrientation(m_rocket->GetOrientation() + 1);
+	}
+	if (input->isKeyDown(aie::INPUT_KEY_D))
+	{
+		m_rocket->SetOrientation(m_rocket->GetOrientation() - 1);
+	}
+
 	m_timer++;
 #endif
 
@@ -140,15 +145,63 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 #endif // Simulating Collision
 
 #ifdef SimulatingRocket
-	m_physicsScene->SetGravity(glm::vec2(0, -9.8f));
+	m_physicsScene->SetGravity(glm::vec2(0, -0.f));
 
 	m_rocket = new Circle(glm::vec2(0, 0), glm::vec2(0, 0),
-		100.f, 9, glm::vec4(1, 0, 1, 1));
+		100.f, 6, glm::vec4(1, 0, 1, 1));
+
+	m_rocket->SetOrientation(-90);
 
 	m_physicsScene->AddActor(m_rocket);
 	m_timer = 0;
 #endif // Simulating Rocket
+
+#ifdef PlaneTest
+	Plane* plane = new Plane(glm::vec2(3, 5), 2.f, glm::vec4(1, 0, 1, 1));
+	m_physicsScene->AddActor(plane);
+#endif // Plane Test
 }
+
+#ifdef SimulatingRocket
+
+void PhysicsApp::GetFuel()
+{
+	float radius = m_rocket->GetRadius();
+	glm::vec2 currPos = m_rocket->GetPos();
+	float angle = DegreesToRadians(m_rocket->GetOrientation());
+
+	if (m_fuel.size() < 10)
+	{
+		Circle* fuel = new Circle(glm::vec2(currPos.x + (radius + 0.5f) * glm::cos(angle),
+			currPos.y + (radius + 0.5f) * glm::sin(angle)), glm::vec2(0),
+			1.f, .5f, glm::vec4(0, 1, 0, 1));
+
+		m_physicsScene->AddActor(fuel);
+		
+		ApplyFuel(fuel, angle);
+		
+	}
+	else
+	{
+		Circle* fuel = m_fuel.front();
+		m_fuel.erase(m_fuel.begin());
+		fuel->SetPos(glm::vec2(currPos.x + (radius + 0.5f) * glm::cos(angle),
+			currPos.y + (radius + 0.5f) * glm::sin(angle)));
+		fuel->SetVel(glm::vec2(0));
+		ApplyFuel(fuel, angle);
+	}
+
+
+	m_timer = 0;
+}
+
+void PhysicsApp::ApplyFuel(Circle* _fuel, float _angle)
+{
+	m_fuel.push_back(_fuel);
+	m_rocket->SetMass(m_rocket->GetMass() - _fuel->GetMass());
+	_fuel->ApplyForceToActor(m_rocket, glm::vec2(1.f * glm::cos(_angle), 1.f * glm::sin(_angle)));
+}
+#endif // functions for rocket simulation
 
 void PhysicsApp::DemoUpdate(aie::Input* _input, float _dt)
 {

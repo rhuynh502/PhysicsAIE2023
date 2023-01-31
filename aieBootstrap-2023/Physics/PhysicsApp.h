@@ -39,5 +39,9 @@ public:
 #ifdef SimulatingRocket
 	Circle* m_rocket;
 	int m_timer;
+	std::vector<Circle*> m_fuel;
+
+	void GetFuel();
+	void ApplyFuel(Circle* _fuel, float _angle);
 #endif
 };
