@@ -17,6 +17,9 @@ public:
 	void ApplyForce(glm::vec2 _force);
 	void ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force);
 
+	void ResolveCollision(RigidBody* _actor2);
+	virtual float CalcKineticEnergy();
+
 	// Getters
 	glm::vec2 GetPos() { return m_pos; }
 	glm::vec2 GetVel() { return m_velocity; }

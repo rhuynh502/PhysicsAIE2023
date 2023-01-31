@@ -23,6 +23,8 @@ public:
 	virtual void Draw(float _alpha) = 0;
 	virtual void ResetPosition() {};
 
+	virtual float CalcKineticEnergy() { return 0; };
+
 	// Getters
 	int GetShapeID() { return m_shapeID; }
 

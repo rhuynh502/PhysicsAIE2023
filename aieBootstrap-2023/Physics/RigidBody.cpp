@@ -1,4 +1,5 @@
 #include "RigidBody.h"
+#include <iostream>
 
 RigidBody::RigidBody()
 {
@@ -33,4 +34,36 @@ void RigidBody::ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force)
 {
 	ApplyForce(_force);
 	_actorOther->ApplyForce(-(_force));
+}
+
+void RigidBody::ResolveCollision(RigidBody* _actor2)
+{
+	glm::vec2 normal = glm::normalize(_actor2->GetPos() - m_pos);
+	glm::vec2 relVel = _actor2->GetVel() - m_velocity;
+
+	if (glm::dot(normal, relVel) >= 0)
+		return;
+
+	float elasticity = 1;
+	float j = glm::dot(-(1 + elasticity) * (relVel), normal) / ((1 / GetMass()) + (1 / _actor2->GetMass()));
+
+	glm::vec2 force = normal * j;
+
+	//float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+
+	ApplyForceToActor(_actor2, -force);
+
+	/*float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+
+	if (kePost - kePre > kePost * 0.01f)
+	{
+		std::cout << "Kinetic Energy discrepancy greater than 1% detected!";
+	}*/
+}
+
+float RigidBody::CalcKineticEnergy()
+{
+	glm::vec2 currVel = GetVel();
+	float vel = glm::sqrt(currVel.x * currVel.x + currVel.y * currVel.y);
+	return 0.5f * GetMass() * vel * vel;
 }

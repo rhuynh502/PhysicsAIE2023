@@ -5,6 +5,6 @@
 //#define NewtonsFirstLaw
 //#define NewtonsSecondLaw
 //#define NewtonsThirdLaw
-//#define SimulatingCollision
+#define SimulatingCollision
 //#define SimulatingRocket
-#define CircleToPlane
+//#define CircleToPlane

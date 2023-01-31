@@ -141,16 +141,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 		if (glm::distance(circ1->GetPos(), circ2->GetPos())
 			<= circ1->GetRadius() + circ2->GetRadius())
 		{
-			glm::vec2 normalise = glm::normalize(circ2->GetPos() - circ1->GetPos());
-			
-			float impulseMag = (- 1 * (1 + 1) * glm::dot(circ1->GetVel() - circ2->GetVel(), normalise))
-				/ glm::dot(normalise , normalise * ((1 / circ1->GetMass()) + (1 / circ2->GetMass())));
-
-			glm::vec2 circ1Final = circ1->GetVel() + (impulseMag / circ1->GetMass()) * normalise;
-			glm::vec2 circ2Final = circ2->GetVel() - (impulseMag / circ2->GetMass()) * normalise;
-
-			circ1->SetVel(circ1Final);
-			circ2->SetVel(circ2Final);
+			circ1->ResolveCollision(circ2);
 			return true;
 		}
 	}
