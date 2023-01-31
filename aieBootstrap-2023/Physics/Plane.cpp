@@ -1,11 +1,18 @@
 #include "Plane.h"
 #include "Gizmos.h"
 
-Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color)
+Plane::Plane() : PhysicsObject(ShapeType::PLANE)
+{
+	m_distanceToOrigin = 0;
+	m_normal = glm::vec2(0, 1);
+}
+
+Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) 
 {
 	m_normal = _normal;
 	m_distanceToOrigin = _distance;
 	m_color = _color;
+	m_shapeID = ShapeType::PLANE;
 }
 
 Plane::~Plane()
@@ -27,6 +34,7 @@ void Plane::Draw(float _alpha)
 	glm::vec2 start = centerPoint + (parallel * lineSegmentLength);
 	glm::vec2 end = centerPoint - (parallel * lineSegmentLength);
 
+	aie::Gizmos::add2DCircle(centerPoint, 2.f, 8, m_color);
 	aie::Gizmos::add2DLine(start, end, m_color);
 	/*aie::Gizmos::add2DTri(start, end, start - m_normal * 10.f, m_color, m_color, colorFade);
 	aie::Gizmos::add2DTri(end, end - m_normal * 10.f, start - m_normal * 10.f, m_color, colorFade, colorFade);*/

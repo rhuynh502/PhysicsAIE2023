@@ -156,9 +156,17 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_timer = 0;
 #endif // Simulating Rocket
 
-#ifdef PlaneTest
-	Plane* plane = new Plane(glm::vec2(3, 5), 2.f, glm::vec4(1, 0, 1, 1));
+#ifdef CircleToPlane
+	m_physicsScene->SetGravity(glm::vec2(0, -9.8f));
+
+	Circle* ball1 = new Circle(glm::vec2(-20, 20), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 0, 1));
+	Circle* ball2 = new Circle(glm::vec2(10, 20), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 1, 1));
+	Plane* plane = new Plane(glm::vec2(0, 1), -50.f, glm::vec4(0, 1, 0, 1));
+
 	m_physicsScene->AddActor(plane);
+	m_physicsScene->AddActor(ball1);
+	m_physicsScene->AddActor(ball2);
+
 #endif // Plane Test
 }
 

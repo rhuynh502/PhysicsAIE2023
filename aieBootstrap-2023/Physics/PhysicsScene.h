@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/vec2.hpp>
+#include <glm/glm.hpp>
 #include <vector>
 
 #include "PhysicsObject.h"
@@ -17,6 +17,7 @@ public:
 	
 	void Update(float _dt);
 	void Draw();
+	void DebugScene();
 
 	//Getters
 	glm::vec2 GetGravity() { return m_gravity; }
@@ -28,6 +29,11 @@ public:
 	void SetTimeStep(const float _timeStep)
 		{ m_timeStep = _timeStep; }
 
+	void CheckForCollision();
+
+	static bool Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);
+	static bool Plane2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);
+	static bool Circle2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);
 	static bool Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);
 
 private:

@@ -1,6 +1,15 @@
 #include "PhysicsScene.h"
 #include "Circle.h"
+#include "Plane.h"
 #include "Demos.h"
+
+typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
+
+static fn collisionFunctionArray[] =
+{
+	PhysicsScene::Plane2Plane, PhysicsScene::Plane2Circle,
+	PhysicsScene::Circle2Plane, PhysicsScene::Circle2Circle,
+};
 
 PhysicsScene::PhysicsScene()
 {
@@ -62,12 +71,19 @@ void PhysicsScene::Update(float _dt)
 			{
 				PhysicsObject* obj1 = m_actors[outer];
 				PhysicsObject* obj2 = m_actors[inner];
+				int shapeID1 = obj1->GetShapeID();
+				int shapeID2 = obj2->GetShapeID();
 
-				Circle2Circle(obj1, obj2);
+				// Use function pointers
+				int fnIndex = (shapeID1 * ShapeType::SHAPE_COUNT) + shapeID2;
+				fn collisionFunctionPtr = collisionFunctionArray[fnIndex];
+				if (collisionFunctionPtr != nullptr)
+				{
+					collisionFunctionPtr(obj1, obj2);
+				}
 			}
 		}
 #endif // !SimulatingRocket
-
 	}
 }
 
@@ -77,6 +93,40 @@ void PhysicsScene::Draw()
 	{
 		pActor->Draw(1);
 	}
+}
+
+bool PhysicsScene::Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
+{
+	return false;
+}
+
+bool PhysicsScene::Plane2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
+{
+	return Circle2Plane(_obj2, _obj1);
+}
+
+bool PhysicsScene::Circle2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
+{
+	Circle* circle = dynamic_cast<Circle*>(_obj1);
+	Plane* plane = dynamic_cast<Plane*>(_obj2);
+
+	if (circle != nullptr && plane != nullptr)
+	{
+		glm::vec2 collisionNormal = plane->GetNormal();
+		float circToPlane = glm::dot(circle->GetPos(), plane->GetNormal());
+
+		float intersection = circToPlane - circle->GetRadius() - plane->GetDistance();
+		float velocityOutPlane = glm::dot(circle->GetVel(), plane->GetNormal());
+
+		if (intersection < 0 && velocityOutPlane < 0)
+		{
+			circle->SetVel(glm::vec2(0));
+			//circle->ApplyForce(-circle->GetVel() * circle->GetMass());
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
@@ -101,8 +151,8 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 
 			circ1->SetVel(circ1Final);
 			circ2->SetVel(circ2Final);
+			return true;
 		}
 	}
-
 	return false;
 }

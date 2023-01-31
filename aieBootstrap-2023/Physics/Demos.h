@@ -7,4 +7,4 @@
 //#define NewtonsThirdLaw
 //#define SimulatingCollision
 //#define SimulatingRocket
-#define PlaneTest
+#define CircleToPlane
