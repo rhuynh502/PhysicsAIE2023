@@ -19,6 +19,8 @@ public:
 
 	void ResolveCollision(RigidBody* _actor2);
 	virtual float CalcKineticEnergy();
+	float CalcPotentialEnergy();
+	virtual float GetEnergy();
 
 	// Getters
 	glm::vec2 GetPos() { return m_pos; }

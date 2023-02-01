@@ -1,5 +1,7 @@
 #include "RigidBody.h"
 #include <iostream>
+#include "glm/glm.hpp"
+#include "PhysicsScene.h"
 
 RigidBody::RigidBody()
 {
@@ -22,7 +24,7 @@ RigidBody::~RigidBody()
 void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
 	m_pos += m_velocity * _timeStep;
-	ApplyForce(_gravity * m_mass * _timeStep);
+	ApplyForce(PhysicsScene::GetGravity() * m_mass * _timeStep);
 }
 
 void RigidBody::ApplyForce(glm::vec2 _force)
@@ -49,16 +51,16 @@ void RigidBody::ResolveCollision(RigidBody* _actor2)
 
 	glm::vec2 force = normal * j;
 
-	//float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+	float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
 	ApplyForceToActor(_actor2, -force);
 
-	/*float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+	float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
 	if (kePost - kePre > kePost * 0.01f)
 	{
 		std::cout << "Kinetic Energy discrepancy greater than 1% detected!";
-	}*/
+	}
 }
 
 float RigidBody::CalcKineticEnergy()
@@ -66,4 +68,14 @@ float RigidBody::CalcKineticEnergy()
 	glm::vec2 currVel = GetVel();
 	float vel = glm::sqrt(currVel.x * currVel.x + currVel.y * currVel.y);
 	return 0.5f * GetMass() * vel * vel;
+}
+
+float RigidBody::CalcPotentialEnergy()
+{
+	return -GetMass() * glm::dot(PhysicsScene::GetGravity(), GetPos());
+}
+
+float RigidBody::GetEnergy()
+{
+	return CalcKineticEnergy() + CalcPotentialEnergy();
 }

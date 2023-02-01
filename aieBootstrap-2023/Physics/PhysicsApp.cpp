@@ -73,7 +73,7 @@ void PhysicsApp::update(float deltaTime) {
 
 	m_timer++;
 #endif
-
+	
 	// exit the application
 	if (input->isKeyDown(aie::INPUT_KEY_ESCAPE))
 		quit();
@@ -162,12 +162,79 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	Circle* ball1 = new Circle(glm::vec2(-20, 20), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 0, 1));
 	Circle* ball2 = new Circle(glm::vec2(10, 20), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 1, 1));
 	Plane* plane = new Plane(glm::vec2(0, 1), -50.f, glm::vec4(0, 1, 0, 1));
+	Plane* plane1 = new Plane(glm::vec2(1, 0), -60.f, glm::vec4(1, 1, 1, 1));
+	Plane* plane2 = new Plane(glm::vec2(1, 2), 20.f, glm::vec4(1, 1, 1, 1));
+	Plane* plane3 = new Plane(glm::vec2(0, 1), 50.f, glm::vec4(1, 1, 1, 1));
 
 	m_physicsScene->AddActor(plane);
+	m_physicsScene->AddActor(plane1);
+	//m_physicsScene->AddActor(plane2);
+	//m_physicsScene->AddActor(plane3);
 	m_physicsScene->AddActor(ball1);
 	m_physicsScene->AddActor(ball2);
 
+	//ball1->ApplyForce(glm::vec2(0, 0));
+
 #endif // Plane Test
+
+#ifdef CircleToCircleNewtons
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	Circle* ball1 = new Circle(glm::vec2(-30, 0), glm::vec2(6, 0), 5, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball2 = new Circle(glm::vec2(10, 0), glm::vec2(0, 0), 5, 3, glm::vec4(1, 0, 1, 1));
+
+	m_physicsScene->AddActor(ball1);
+	m_physicsScene->AddActor(ball2);
+
+#endif // Newtons Cradle
+
+#ifdef SymmetricalNewtons
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	Circle* ball1 = new Circle(glm::vec2(0, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball2 = new Circle(glm::vec2(6, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball3 = new Circle(glm::vec2(12, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball4 = new Circle(glm::vec2(-6, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball5 = new Circle(glm::vec2(-12, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+
+	Plane* wall1 = new Plane(glm::vec2(1, 0), -20, glm::vec4(1, 1, 1, 1));
+	Plane* wall2 = new Plane(glm::vec2(-1, 0), -20, glm::vec4(1, 1, 1, 1));
+
+	m_physicsScene->AddActor(ball1); 
+	m_physicsScene->AddActor(ball2);
+	m_physicsScene->AddActor(ball3);
+	m_physicsScene->AddActor(ball4);
+	m_physicsScene->AddActor(ball5);
+	m_physicsScene->AddActor(wall1);
+	m_physicsScene->AddActor(wall2);
+
+	ball3->ApplyForce(glm::vec2(-65, 0));
+
+#endif // Symmetrical Newtons Cradle
+
+#ifdef AsymmetricalNewtons
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	Circle* ball1 = new Circle(glm::vec2(0, 0), glm::vec2(0, 0), 16, 3, glm::vec4(1, 1, 1, 1));
+	Circle* ball2 = new Circle(glm::vec2(6, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball3 = new Circle(glm::vec2(12, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball4 = new Circle(glm::vec2(-6, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball5 = new Circle(glm::vec2(-12, 0), glm::vec2(0, 0), 8, 3, glm::vec4(1, 0, 1, 1));
+
+	Plane* wall1 = new Plane(glm::vec2(1, 0), -20, glm::vec4(1, 1, 1, 1));
+	Plane* wall2 = new Plane(glm::vec2(-1, 0), -20, glm::vec4(1, 1, 1, 1));
+
+	m_physicsScene->AddActor(ball1); 
+	m_physicsScene->AddActor(ball2);
+	m_physicsScene->AddActor(ball3);
+	m_physicsScene->AddActor(ball4);
+	m_physicsScene->AddActor(ball5);
+	m_physicsScene->AddActor(wall1);
+	m_physicsScene->AddActor(wall2);
+
+	ball3->ApplyForce(glm::vec2(-65, 0));
+
+#endif // Symmetrical Newtons Cradle
 }
 
 #ifdef SimulatingRocket
