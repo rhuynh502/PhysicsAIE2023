@@ -34,8 +34,8 @@ void RigidBody::ApplyForce(glm::vec2 _force)
 
 void RigidBody::ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force)
 {
-	ApplyForce(_force);
-	_actorOther->ApplyForce(-(_force));
+	ApplyForce(-_force);
+	_actorOther->ApplyForce(_force);
 }
 
 void RigidBody::ResolveCollision(RigidBody* _actor2)
@@ -53,7 +53,7 @@ void RigidBody::ResolveCollision(RigidBody* _actor2)
 
 	float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
-	ApplyForceToActor(_actor2, -force);
+	ApplyForceToActor(_actor2, force);
 
 	float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 

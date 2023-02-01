@@ -35,9 +35,9 @@ void Plane::Draw(float _alpha)
 	glm::vec2 start = centerPoint + (parallel * lineSegmentLength);
 	glm::vec2 end = centerPoint - (parallel * lineSegmentLength);
 
-	aie::Gizmos::add2DLine(start, end, m_color);
-	/*aie::Gizmos::add2DTri(start, end, start - m_normal * 10.f, m_color, m_color, colorFade);
-	aie::Gizmos::add2DTri(end, end - m_normal * 10.f, start - m_normal * 10.f, m_color, colorFade, colorFade);*/
+	//aie::Gizmos::add2DLine(start, end, m_color);
+	aie::Gizmos::add2DTri(start, end, start - m_normal * 10.f, m_color, m_color, colorFade);
+	aie::Gizmos::add2DTri(end, end - m_normal * 10.f, start - m_normal * 10.f, m_color, colorFade, colorFade);
 }
 
 void Plane::ResetPosition()

@@ -6,7 +6,7 @@
 
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
 
-glm::vec2 PhysicsScene::m_gravity;
+glm::vec2 PhysicsScene::m_gravity(0, 0);
 
 static fn collisionFunctionArray[] =
 {

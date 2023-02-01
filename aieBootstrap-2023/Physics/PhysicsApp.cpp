@@ -163,13 +163,13 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	Circle* ball2 = new Circle(glm::vec2(10, 20), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 1, 1));
 	Plane* plane = new Plane(glm::vec2(0, 1), -50.f, glm::vec4(0, 1, 0, 1));
 	Plane* plane1 = new Plane(glm::vec2(1, 0), -60.f, glm::vec4(1, 1, 1, 1));
-	Plane* plane2 = new Plane(glm::vec2(1, 2), 20.f, glm::vec4(1, 1, 1, 1));
-	Plane* plane3 = new Plane(glm::vec2(0, 1), 50.f, glm::vec4(1, 1, 1, 1));
+	Plane* plane2 = new Plane(glm::normalize(glm::vec2(4, 7)), -20.f, glm::vec4(1, 1, 1, 1));
+	Plane* plane3 = new Plane(glm::vec2(0, -1), -50.f, glm::vec4(1, 1, 1, 1));
 
 	m_physicsScene->AddActor(plane);
 	m_physicsScene->AddActor(plane1);
-	//m_physicsScene->AddActor(plane2);
-	//m_physicsScene->AddActor(plane3);
+	m_physicsScene->AddActor(plane2);
+	m_physicsScene->AddActor(plane3);
 	m_physicsScene->AddActor(ball1);
 	m_physicsScene->AddActor(ball2);
 
