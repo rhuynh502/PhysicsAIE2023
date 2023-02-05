@@ -107,7 +107,6 @@ float PhysicsScene::GetTotalEnergy()
 		PhysicsObject* obj = *it;
 		total += obj->GetEnergy();
 	}
-	std::cout << total;
 	return total;
 }
 
@@ -136,7 +135,9 @@ bool PhysicsScene::Circle2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
 
 		if (intersection < 0 && velocityOutPlane < 0)
 		{
-			plane->ResolveCollision(circle);
+			glm::vec2 contact = circle->GetPos() + (collisionNormal * -circle->GetRadius());
+
+			plane->ResolveCollision(circle, contact);
 			return true;
 		}
 	}
@@ -156,7 +157,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 		if (glm::distance(circ1->GetPos(), circ2->GetPos())
 			<= circ1->GetRadius() + circ2->GetRadius())
 		{
-			circ1->ResolveCollision(circ2);
+			circ1->ResolveCollision(circ2, 0.5f * (circ1->GetPos() + circ2->GetPos()));
 			return true;
 		}
 	}

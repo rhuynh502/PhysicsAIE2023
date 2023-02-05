@@ -13,7 +13,7 @@ public:
 	virtual void Draw(float _alpha);
 	virtual void ResetPosition();
 
-	void ResolveCollision(RigidBody* _actor);
+	void ResolveCollision(RigidBody* _actor, glm::vec2 _contact);
 
 	// Getters
 	glm::vec2 GetNormal() { return m_normal; }

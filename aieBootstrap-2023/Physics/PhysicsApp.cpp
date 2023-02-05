@@ -140,8 +140,8 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->AddActor(ball1);
 	m_physicsScene->AddActor(ball2);
 
-	ball1->ApplyForce(glm::vec2(5, 0));
-	ball2->ApplyForce(glm::vec2(-3, 0));
+	ball1->ApplyForce(glm::vec2(5, 0), ball1->GetPos());
+	ball2->ApplyForce(glm::vec2(-3, 0), ball2->GetPos());
 #endif // Simulating Collision
 
 #ifdef SimulatingRocket
@@ -165,11 +165,13 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	Plane* plane1 = new Plane(glm::vec2(1, 0), -60.f, glm::vec4(1, 1, 1, 1));
 	Plane* plane2 = new Plane(glm::normalize(glm::vec2(4, 7)), -20.f, glm::vec4(1, 1, 1, 1));
 	Plane* plane3 = new Plane(glm::vec2(0, -1), -50.f, glm::vec4(1, 1, 1, 1));
+	Plane* plane4 = new Plane(glm::vec2(-1, 0), -50.f, glm::vec4(1, 1, 1, 1));
 
 	m_physicsScene->AddActor(plane);
 	m_physicsScene->AddActor(plane1);
 	m_physicsScene->AddActor(plane2);
 	m_physicsScene->AddActor(plane3);
+	m_physicsScene->AddActor(plane4);
 	m_physicsScene->AddActor(ball1);
 	m_physicsScene->AddActor(ball2);
 
@@ -208,7 +210,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->AddActor(wall1);
 	m_physicsScene->AddActor(wall2);
 
-	ball3->ApplyForce(glm::vec2(-65, 0));
+	ball3->ApplyForce(glm::vec2(-65, 0), ball3->GetPos());
 
 #endif // Symmetrical Newtons Cradle
 

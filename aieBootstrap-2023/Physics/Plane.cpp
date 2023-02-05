@@ -44,7 +44,7 @@ void Plane::ResetPosition()
 {
 }
 
-void Plane::ResolveCollision(RigidBody* _actor)
+void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 {
 	glm::vec2 normal = GetNormal();
 	glm::vec2 relVel = _actor->GetVel();
@@ -54,5 +54,5 @@ void Plane::ResolveCollision(RigidBody* _actor)
 
 	glm::vec2 force = normal * j;
 
-	_actor->ApplyForce(force);
+	_actor->ApplyForce(force, _contact - _actor->GetPos());
 }
