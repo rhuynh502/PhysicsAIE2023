@@ -24,6 +24,7 @@ public:
 	virtual void ResetPosition() {};
 
 	virtual float CalcKineticEnergy() { return 0; };
+	virtual float GetEnergy() { return 0; }
 
 	// Getters
 	int GetShapeID() { return m_shapeID; }

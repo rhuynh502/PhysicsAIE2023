@@ -8,6 +8,7 @@ class PhysicsObject;
 
 class PhysicsScene
 {
+	static glm::vec2 m_gravity;
 public:
 	PhysicsScene();
 	~PhysicsScene();
@@ -20,7 +21,7 @@ public:
 	void DebugScene();
 
 	//Getters
-	glm::vec2 GetGravity() { return m_gravity; }
+	static glm::vec2 GetGravity() { return m_gravity; }
 	float GetTimeStep() { return m_timeStep; }
 
 	//Setters
@@ -30,14 +31,14 @@ public:
 		{ m_timeStep = _timeStep; }
 
 	void CheckForCollision();
+	float GetTotalEnergy();
 
 	static bool Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);
 	static bool Plane2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);
 	static bool Circle2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);
 	static bool Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);
 
-private:
-	glm::vec2 m_gravity;
+protected:
 	float m_timeStep;
 
 	std::vector<PhysicsObject*> m_actors;

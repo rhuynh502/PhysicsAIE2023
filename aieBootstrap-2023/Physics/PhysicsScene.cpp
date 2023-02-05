@@ -2,8 +2,11 @@
 #include "Circle.h"
 #include "Plane.h"
 #include "Demos.h"
+#include <iostream>
 
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
+
+glm::vec2 PhysicsScene::m_gravity(0, 0);
 
 static fn collisionFunctionArray[] =
 {
@@ -14,7 +17,7 @@ static fn collisionFunctionArray[] =
 PhysicsScene::PhysicsScene()
 {
 	m_timeStep = 0.01;
-	m_gravity = glm::vec2(0);
+	m_gravity = glm::vec2(0, 0);
 }
 
 PhysicsScene::~PhysicsScene()
@@ -85,6 +88,7 @@ void PhysicsScene::Update(float _dt)
 		}
 #endif // !SimulatingRocket
 	}
+	GetTotalEnergy();
 }
 
 void PhysicsScene::Draw()
@@ -93,6 +97,17 @@ void PhysicsScene::Draw()
 	{
 		pActor->Draw(1);
 	}
+}
+
+float PhysicsScene::GetTotalEnergy()
+{
+	float total = 0;
+	for (auto it = m_actors.begin(); it != m_actors.end(); it++)
+	{
+		PhysicsObject* obj = *it;
+		total += obj->GetEnergy();
+	}
+	return total;
 }
 
 bool PhysicsScene::Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
@@ -120,8 +135,9 @@ bool PhysicsScene::Circle2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
 
 		if (intersection < 0 && velocityOutPlane < 0)
 		{
-			circle->SetVel(glm::vec2(0));
-			//circle->ApplyForce(-circle->GetVel() * circle->GetMass());
+			glm::vec2 contact = circle->GetPos() + (collisionNormal * -circle->GetRadius());
+
+			plane->ResolveCollision(circle, contact);
 			return true;
 		}
 	}
@@ -141,7 +157,7 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 		if (glm::distance(circ1->GetPos(), circ2->GetPos())
 			<= circ1->GetRadius() + circ2->GetRadius())
 		{
-			circ1->ResolveCollision(circ2);
+			circ1->ResolveCollision(circ2, 0.5f * (circ1->GetPos() + circ2->GetPos()));
 			return true;
 		}
 	}
