@@ -78,8 +78,8 @@ void PhysicsApp::update(float deltaTime) {
 #ifdef SetPoolTable
 	if (input->isKeyDown(aie::INPUT_KEY_SPACE))
 	{
-		float cos = glm::cos(DegreesToRadians(m_cueBall->GetOrientation()));
-		float sin = glm::sin(DegreesToRadians(m_cueBall->GetOrientation()));
+		float cos = glm::cos(m_cueBall->GetOrientation());
+		float sin = glm::sin(m_cueBall->GetOrientation());
 
 		m_cueBall->ApplyForce(glm::vec2(-50 * cos - -50 * sin, -50 * sin + -50 * cos) * m_cueBall->GetOrientation(), m_cueBall->GetPos());
 	}
