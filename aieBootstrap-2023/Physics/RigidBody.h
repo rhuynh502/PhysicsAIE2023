@@ -23,6 +23,7 @@ public:
 	virtual float GetEnergy();
 
 	void CalculateSmoothedPosition(float _alpha);
+	void CalculateAxes();
 
 	// Getters
 	glm::vec2 GetPos() { return m_pos; }
@@ -32,6 +33,8 @@ public:
 	float GetAngularVel() { return m_angularVel; }
 	float GetMoment() { return m_moment; }
 	glm::vec4 GetColor() { return m_color; }
+	glm::vec2 GetLocalX() { return m_localX; }
+	glm::vec2 GetLocalY() { return m_localY; }
 
 	// Setters
 	void SetPos(glm::vec2 _pos) { m_pos = _pos; }
@@ -48,9 +51,9 @@ protected:
 	glm::vec2 m_lastPos;
 	float m_mass;
 	float m_orientation;
-
 	float m_angularVel;
 	float m_moment;
+
 	float m_lastOrientation;
 
 	glm::vec4 m_color;
@@ -58,6 +61,9 @@ protected:
 	glm::vec2 m_smoothedPosition;
 	glm::vec2 m_smoothedLocalX;
 	glm::vec2 m_smoothedLocalY;
+
+	glm::vec2 m_localX;
+	glm::vec2 m_localY;
 
 };
 

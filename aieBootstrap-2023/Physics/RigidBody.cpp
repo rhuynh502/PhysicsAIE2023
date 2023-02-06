@@ -24,17 +24,22 @@ RigidBody::~RigidBody()
 
 void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
+	CalculateAxes();
 	m_lastPos = m_pos;
-	m_pos += m_vel * _timeStep;
-	ApplyForce(PhysicsScene::GetGravity() * m_mass * _timeStep, m_pos);
-
 	m_lastOrientation = m_orientation;
+
+	m_pos += m_vel * _timeStep;
+
+	ApplyForce(_gravity * GetMass() * _timeStep, glm::vec2(0));
+
 	m_orientation += m_angularVel * _timeStep;
+
 }
 
 void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 {
 	m_vel += _force / GetMass();
+
 	m_angularVel += (_force.y * _pos.x - _force.x * _pos.y) / GetMoment();
 }
 
@@ -98,4 +103,12 @@ void RigidBody::CalculateSmoothedPosition(float _alpha)
 	float cos = cosf(smoothedOrientation);
 	m_smoothedLocalX = glm::vec2(cos, sin);
 	m_smoothedLocalY = glm::vec2(-sin, cos);
+}
+
+void RigidBody::CalculateAxes()
+{
+	float sin = sinf(m_orientation);
+	float cos = cosf(m_orientation);
+	m_localX = glm::vec2(cos, sin);
+	m_localY = glm::vec2(-sin, cos);
 }

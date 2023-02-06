@@ -6,6 +6,7 @@
 #include "Demos.h"
 #include "Circle.h"
 #include "Plane.h"
+#include "Box.h"
 
 #include "PhysicsScene.h"
 
@@ -237,6 +238,23 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	ball3->ApplyForce(glm::vec2(-65, 0));
 
 #endif // Symmetrical Newtons Cradle
+
+#ifdef BoxOnPlane
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Plane* floor = new Plane(glm::vec2(0, 1), -30, glm::vec4(1, 1, 1, 1));
+
+	Circle* ball = new Circle(glm::vec2(20, 0), glm::vec2(0, 0), 4.f, 4.f, glm::vec4(1, 0, 1, 1));
+	Box* boxFlat = new Box(glm::vec2(-20, 0), glm::vec2(0, 0), 4.f, glm::vec2(4, 4), glm::vec4(1, 0, 1, 1));
+	Box* boxAngle = new Box(glm::vec2(0, 0), glm::vec2(0, 0), 4.f, glm::vec2(4, 4), glm::vec4(1, 0, 1, 1));
+	boxAngle->SetOrientation(DegreesToRadians(45));
+
+	m_physicsScene->AddActor(floor);
+	m_physicsScene->AddActor(ball);
+	m_physicsScene->AddActor(boxFlat);
+	m_physicsScene->AddActor(boxAngle);
+
+#endif // Falling box on plane
 }
 
 #ifdef SimulatingRocket
