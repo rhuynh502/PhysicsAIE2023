@@ -76,20 +76,25 @@ void PhysicsApp::update(float deltaTime) {
 #endif
 
 #ifdef SetPoolTable
-	if (input->isKeyDown(aie::INPUT_KEY_SPACE))
+	if (input->isMouseButtonDown(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
-		float cos = glm::cos(m_cueBall->GetOrientation());
-		float sin = glm::sin(m_cueBall->GetOrientation());
+		if (!m_onClick)
+		{
+			m_initialPos.x = input->getMouseX();
+			m_initialPos.y = input->getMouseY();
+			m_onClick = true;
+		}
+		m_appliedForce.x = m_initialPos.x - input->getMouseX();
+		m_appliedForce.y = m_initialPos.y - input->getMouseY();
 
-		m_cueBall->ApplyForce(glm::vec2(-50 * cos - -50 * sin, -50 * sin + -50 * cos) * m_cueBall->GetOrientation(), m_cueBall->GetPos());
+		aie::Gizmos::add2DLine(m_cueBall->GetPos(), m_cueBall->GetPos() - (-m_appliedForce / 10.f), glm::vec4(1, 0, 0, 1));
 	}
-	if (input->isKeyDown(aie::INPUT_KEY_LEFT))
+	if (input->isMouseButtonUp(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
-		m_cueBall->SetOrientation(m_cueBall->GetOrientation() + 0.1f);
-	}
-	if (input->isKeyDown(aie::INPUT_KEY_RIGHT))
-	{
-		m_cueBall->SetOrientation(m_cueBall->GetOrientation() - 0.1f);
+		m_cueBall->ApplyForce(m_appliedForce, m_cueBall->GetPos());
+		m_onClick = false;
+		m_initialPos = glm::vec2(0);
+		m_appliedForce = glm::vec2(0);
 	}
 
 #endif // launch cue ball
@@ -111,7 +116,7 @@ void PhysicsApp::draw() {
 	static float aspectRatio = 16.f / 9.f;
 	aie::Gizmos::draw2D(glm::ortho<float>(-100, 100,
 		-100 / aspectRatio, 100 / aspectRatio, -1.f, 1.f));
-	
+
 	// output some text, uses the last used colour
 	m_2dRenderer->drawText(m_font, "Press ESC to quit", 0, 0);
 

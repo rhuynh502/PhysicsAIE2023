@@ -47,5 +47,8 @@ public:
 
 #ifdef SetPoolTable
 	Circle* m_cueBall;
+	glm::vec2 m_appliedForce = glm::vec2(0);
+	glm::vec2 m_initialPos;
+	bool m_onClick = false;
 #endif
 };
