@@ -44,4 +44,8 @@ public:
 	void GetFuel();
 	void ApplyFuel(Circle* _fuel, float _angle);
 #endif
+
+#ifdef SetPoolTable
+	Circle* m_cueBall;
+#endif
 };

@@ -7,6 +7,7 @@ Plane::Plane() : PhysicsObject(ShapeType::PLANE)
 {
 	m_distanceToOrigin = 0;
 	m_normal = glm::vec2(0, 1);
+	m_elasticity = 1;
 }
 
 Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) 
@@ -15,6 +16,7 @@ Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color)
 	m_distanceToOrigin = _distance;
 	m_color = _color;
 	m_shapeID = ShapeType::PLANE;
+	m_elasticity = 1;
 }
 
 Plane::~Plane()
@@ -53,7 +55,7 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 	glm::vec2 velRel = _actor->GetVel() + _actor->GetAngularVel() * glm::vec2(-localContact.y, localContact.x);
 	float velIntoPlane = glm::dot(velRel, m_normal);
 
-	float e = 1;
+	float e = (GetElasticity() + _actor->GetElasticity()) / 2.0f;
 
 	float r = glm::dot(localContact, glm::vec2(m_normal.y, m_normal.x));
 

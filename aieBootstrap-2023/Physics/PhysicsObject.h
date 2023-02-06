@@ -28,8 +28,13 @@ public:
 
 	// Getters
 	int GetShapeID() { return m_shapeID; }
+	float GetElasticity() { return m_elasticity; }
+
+	// Setters
+	void SetElasticity(float _elasticity) { m_elasticity = _elasticity; }
 
 protected:
 	ShapeType m_shapeID;
+	float m_elasticity;
 };
 

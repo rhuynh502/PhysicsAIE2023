@@ -3,6 +3,9 @@
 #include "glm/glm.hpp"
 #include "PhysicsScene.h"
 
+#define MIN_LINEAR_THRESHOLD 0.099f
+#define MIN_ANGULAR_THRESHOLD 0.01f
+
 RigidBody::RigidBody()
 {
 }
@@ -16,6 +19,9 @@ RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _
 	m_mass = _mass;
 	m_color = _color;
 	m_angularVel = 0;
+	m_linearDrag = 0.3f;
+	m_angularDrag = 0.3f;
+	m_elasticity = 1.f;
 }
 
 RigidBody::~RigidBody()
@@ -24,6 +30,16 @@ RigidBody::~RigidBody()
 
 void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
+	if (glm::length(m_vel) < MIN_LINEAR_THRESHOLD)
+	{
+		m_vel = glm::vec2(0, 0);
+	}
+
+	if (glm::length(m_angularVel) < MIN_ANGULAR_THRESHOLD)
+	{
+		m_angularVel = 0;
+	}
+
 	CalculateAxes();
 	m_lastPos = m_pos;
 	m_lastOrientation = m_orientation;
@@ -33,6 +49,9 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 	ApplyForce(_gravity * GetMass() * _timeStep, glm::vec2(0));
 
 	m_orientation += m_angularVel * _timeStep;
+
+	m_vel -= m_vel * m_linearDrag * _timeStep;
+	m_angularVel -= m_angularVel * m_angularDrag * _timeStep;
 
 }
 
@@ -53,6 +72,7 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 {
 	// find vec normal or use provided one
 	glm::vec2 normal = glm::normalize(_collisionNorm ? *_collisionNorm : _actor2->GetPos() - m_pos);
+	glm::vec2 relVel = _actor2->GetVel() - m_vel;
 	glm::vec2 perp(normal.y, -normal.x);
 	
 	float r1 = glm::dot(_contact - m_pos, -perp);
@@ -66,10 +86,12 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 		float mass1 = 1.0f / (1.0f / m_mass + (r1 * r1) / m_moment);
 		float mass2 = 1.0f / (1.0f / _actor2->m_mass + (r1 * r1) / _actor2->m_moment);
 
-		float elasticity = 1;
+		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2.0f;
 
-		glm::vec2 force = (1.0f + elasticity) * mass1 * mass2 /
-			(mass1 + mass2) * (v1 - v2) * normal;
+		float j = glm::dot(-(1 + elasticity) * (relVel), normal) /
+			glm::dot(normal, normal * ((1 / m_mass) + (1 / _actor2->GetMass())));
+
+		glm::vec2 force = normal * j;
 
 		ApplyForce(-force, _contact - m_pos);
 		_actor2->ApplyForce(force, _contact - _actor2->m_pos);
@@ -80,7 +102,7 @@ float RigidBody::CalcKineticEnergy()
 {
 	glm::vec2 currVel = GetVel();
 	float vel = glm::sqrt(currVel.x * currVel.x + currVel.y * currVel.y);
-	return 0.5f * GetMass() * vel * vel;
+	return 0.5f * (GetMass() * glm::dot(m_vel, m_vel) + m_moment * m_angularVel * m_angularVel);
 }
 
 float RigidBody::CalcPotentialEnergy()

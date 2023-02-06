@@ -5,11 +5,8 @@
 Circle::Circle(glm::vec2 _pos, glm::vec2 _vel, float _mass, float _radius, glm::vec4 _color) :
 	RigidBody(CIRCLE, _pos, _vel, 0.f, _mass, _color)
 {
-	m_pos = _pos;
-	m_vel = _vel;
-	m_mass = _mass;
 	m_radius = _radius;
-	m_color = _color;
+
 	m_angularVel = 0;
 	
 	m_moment = 0.5f * m_mass * m_radius * m_radius;

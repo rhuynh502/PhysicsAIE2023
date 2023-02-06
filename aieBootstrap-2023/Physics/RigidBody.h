@@ -35,6 +35,8 @@ public:
 	glm::vec4 GetColor() { return m_color; }
 	glm::vec2 GetLocalX() { return m_localX; }
 	glm::vec2 GetLocalY() { return m_localY; }
+	float GetLinearDrag() { return m_linearDrag; }
+	float GetAngularDrag() { return m_angularDrag; }
 
 	// Setters
 	void SetPos(glm::vec2 _pos) { m_pos = _pos; }
@@ -44,6 +46,8 @@ public:
 	void SetAngularVel(float _angularVel) { m_angularVel = _angularVel; }
 	void SetMoment(float _moment) { m_moment = _moment; }
 	void SetColor(glm::vec4 _color) { m_color = _color; }
+	void SetLinearDrag(float _linearDrag) { m_linearDrag = _linearDrag; }
+	void SetAngularDrag(float _angularDrag) { m_angularDrag = _angularDrag; }
 
 protected:
 	glm::vec2 m_pos;
@@ -65,5 +69,7 @@ protected:
 	glm::vec2 m_localX;
 	glm::vec2 m_localY;
 
+	float m_linearDrag;
+	float m_angularDrag;
 };
 

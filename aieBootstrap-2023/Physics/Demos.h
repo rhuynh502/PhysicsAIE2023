@@ -11,4 +11,7 @@
 //#define CircleToCircleNewtons
 //#define SymmetricalNewtons
 //#define AsymmetricalNewtons
-#define BoxOnPlane
+//#define BoxOnPlane
+//#define BoxOnCircle
+//#define BounceToStop
+#define SetPoolTable
