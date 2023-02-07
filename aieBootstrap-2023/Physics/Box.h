@@ -13,7 +13,7 @@ public:
 		glm::vec4 _color);
 	~Box();
 
-	bool CheckBoxCorners(Box& _box, glm::vec2& _contact, int& _numContacts, float& _pen, glm::vec2& _edgeNormal);
+	bool CheckBoxCorners(const Box& _box, glm::vec2& _contact, int& _numContacts, float& _pen, glm::vec2& _edgeNormal);
 
 	virtual void Draw(float _alpha);
 

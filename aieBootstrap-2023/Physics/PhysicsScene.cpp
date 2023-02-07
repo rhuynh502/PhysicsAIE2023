@@ -67,6 +67,8 @@ void PhysicsScene::Update(float _dt)
 		}
 		accumulatedTime -= m_timeStep;
 
+		CheckForCollision();
+
 #ifndef SimulatingRocket
 		int actorCount = m_actors.size();
 
@@ -80,7 +82,7 @@ void PhysicsScene::Update(float _dt)
 				int shapeID2 = obj2->GetShapeID();
 
 				// Use function pointers
-				int fnIndex = (shapeID1 * ShapeType::SHAPE_COUNT) + shapeID2;
+				int fnIndex = (shapeID1 * SHAPE_COUNT) + shapeID2;
 				fn collisionFunctionPtr = collisionFunctionArray[fnIndex];
 				if (collisionFunctionPtr != nullptr)
 				{
@@ -101,6 +103,25 @@ void PhysicsScene::Draw()
 	}
 }
 
+void PhysicsScene::CheckForCollision()
+{
+	int actorCount = m_actors.size();
+
+	for (int outer = 0; outer < actorCount - 1; outer++)
+	{
+		for (int inner = outer + 1; inner < actorCount; inner++)
+		{
+			PhysicsObject* obj1 = m_actors[outer];
+			PhysicsObject* obj2 = m_actors[inner];
+			int shapeId1 = obj1->GetShapeID();
+			int shapeId2 = obj2->GetShapeID();
+
+			if (shapeId1 < 0 || shapeId2 < 0)
+				continue;
+		}
+	}
+}
+
 float PhysicsScene::GetTotalEnergy()
 {
 	float total = 0;
@@ -110,6 +131,18 @@ float PhysicsScene::GetTotalEnergy()
 		total += obj->GetEnergy();
 	}
 	return total;
+}
+
+void PhysicsScene::ApplyContactForces(RigidBody* _body1, RigidBody* _body2, glm::vec2 _norm, float _pen)
+{
+	float body2Mass = _body2 ? _body2->GetMass() : INT_MAX;
+
+	float body1Factor = body2Mass / (_body1->GetMass() + body2Mass);
+
+	_body1->SetPos(_body1->GetPos() - body1Factor * _norm * _pen);
+	if (_body2)
+		_body2->SetPos(_body2->GetPos() + (1 - body1Factor) * _norm * _pen);
+
 }
 
 bool PhysicsScene::Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2)
@@ -156,10 +189,10 @@ bool PhysicsScene::Circle2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 	// if successful, test for collision
 	if (circ1 != nullptr && circ2 != nullptr)
 	{
-		if (glm::distance(circ1->GetPos(), circ2->GetPos())
-			<= circ1->GetRadius() + circ2->GetRadius())
+		float penetration = circ1->GetRadius() + circ2->GetRadius() - glm::distance(circ1->GetPos(), circ2->GetPos());
+		if (penetration > 0)
 		{
-			circ1->ResolveCollision(circ2, 0.5f * (circ1->GetPos() + circ2->GetPos()));
+			circ1->ResolveCollision(circ2, 0.5f * (circ1->GetPos() + circ2->GetPos()), nullptr, penetration);
 			return true;
 		}
 	}
@@ -237,11 +270,13 @@ bool PhysicsScene::Box2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2)
 		glm::vec2 closestPointOnBoxWorld = box->GetPos() + closestPointOnBoxBox.x * box->GetLocalX() + closestPointOnBoxBox.y * box->GetLocalY();
 		glm::vec2 circleToBox = circle->GetPos() - closestPointOnBoxWorld;
 
-		if (glm::length(circleToBox) < circle->GetRadius())
+		float pen = circle->GetRadius() - glm::length(circleToBox);
+
+		if (pen > 0)
 		{
 			glm::vec2 direction = glm::normalize(circleToBox);
 			glm::vec2 contact = closestPointOnBoxWorld;
-			box->ResolveCollision(circle, contact, &direction);
+			box->ResolveCollision(circle, contact, &direction, pen);
 			return true;
 		}
 
@@ -264,7 +299,7 @@ bool PhysicsScene::Box2Box(PhysicsObject* _obj1, PhysicsObject* _obj2)
 			norm = -norm;
 		}
 		if (pen > 0) {
-			box1->ResolveCollision(box2, contact / float(numContacts), &norm);
+			box1->ResolveCollision(box2, contact / float(numContacts), &norm, pen);
 		}
 		return true;
 	}

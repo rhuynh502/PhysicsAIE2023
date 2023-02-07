@@ -10,6 +10,8 @@ Circle::Circle(glm::vec2 _pos, glm::vec2 _vel, float _mass, float _radius, glm::
 	m_angularVel = 0;
 	
 	m_moment = 0.5f * m_mass * m_radius * m_radius;
+
+	m_isKinematic = false;
 }
 
 void Circle::Draw(float _alpha)

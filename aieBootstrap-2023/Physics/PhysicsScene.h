@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "PhysicsObject.h"
+#include "RigidBody.h"
 
 class PhysicsObject;
 
@@ -32,6 +33,7 @@ public:
 
 	void CheckForCollision();
 	float GetTotalEnergy();
+	static void ApplyContactForces(RigidBody* _body1, RigidBody* _body2, glm::vec2 _norm, float _pen);
 
 	static bool Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);
 	static bool Plane2Circle(PhysicsObject* _obj1, PhysicsObject* _obj2);

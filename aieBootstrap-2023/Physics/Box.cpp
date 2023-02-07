@@ -14,6 +14,8 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 	m_height = _extents.y * 2;
 
 	m_moment = 1.0f / 3.0f * m_mass * m_width * m_height;
+
+	m_isKinematic = false;
 }
 
 Box::Box(glm::vec2 _pos, glm::vec2 _vel, 
@@ -31,24 +33,26 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 	m_extents = glm::vec2(_width / 2, _height / 2);
 
 	m_moment = 1.0f / 12.0f * m_mass * m_width * m_height;
+
+	m_isKinematic = false;
 }
 
 Box::~Box()
 {
 }
 
-bool Box::CheckBoxCorners(Box& _box, glm::vec2& _contact, int& _numContacts, float& _pen, glm::vec2& _edgeNormal)
+bool Box::CheckBoxCorners(const Box& _box, glm::vec2& _contact, int& _numContacts, float& _pen, glm::vec2& _edgeNormal)
 {
 	float minX, maxX, minY, maxY;
-	float boxW = _box.GetExtents().x * 2;
-	float boxH = _box.GetExtents().y * 2;
+	float boxW = _box.m_extents.x * 2;
+	float boxH = _box.m_extents.y * 2;
 	int numLocalContacts = 0;
 	glm::vec2 localContact(0, 0);
 	bool first = true;
 
-	for (float x = -_box.GetExtents().x; x < boxW; x += boxW)
+	for (float x = -_box.m_extents.x; x < boxW; x += boxW)
 	{
-		for (float y = -_box.GetExtents().y; y < boxH; y += boxH)
+		for (float y = -_box.m_extents.y; y < boxH; y += boxH)
 		{
 			// Get the position in worldspace
 			glm::vec2 p = _box.GetPos() + x * _box.m_localX + y * _box.m_localY;

@@ -91,7 +91,7 @@ void PhysicsApp::update(float deltaTime) {
 	}
 	if (input->isMouseButtonUp(aie::INPUT_MOUSE_BUTTON_LEFT))
 	{
-		m_cueBall->ApplyForce(m_appliedForce, m_cueBall->GetPos());
+		m_cueBall->ApplyForce(m_appliedForce, glm::vec2(0));
 		m_onClick = false;
 		m_initialPos = glm::vec2(0);
 		m_appliedForce = glm::vec2(0);
@@ -293,6 +293,22 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	Box* boxFlat = new Box(glm::vec2(-2, -4), glm::vec2(0, 0), 4.f, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
 	Box* boxAngle = new Box(glm::vec2(-6, 2), glm::vec2(0, 0), 4.f, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
 
+	ball->SetElasticity(0.2f);
+	ball1->SetElasticity(0.2f);
+	ball2->SetElasticity(0.2f);
+	boxFlat->SetElasticity(0.2f);
+	boxAngle->SetElasticity(0.2f);
+	ball->SetLinearDrag(0.8f);
+	ball1->SetLinearDrag(0.8f);
+	ball2->SetLinearDrag(0.8f);
+	boxFlat->SetLinearDrag(0.8f);
+	boxAngle->SetLinearDrag(0.8f);
+	ball->SetAngularDrag(0.8f);
+	ball1->SetAngularDrag(0.8f);
+	ball2->SetAngularDrag(0.8f);
+	boxFlat->SetAngularDrag(0.8f);
+	boxAngle->SetAngularDrag(0.8f);
+
 	m_physicsScene->AddActor(floor);
 	m_physicsScene->AddActor(floor1);
 	m_physicsScene->AddActor(floor2);
@@ -352,7 +368,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	}
 
 	m_cueBall = new Circle(glm::vec2(45, 0), glm::vec2(0, 0), 5, 0.8f, glm::vec4(1, 0, 1, 1));
-	m_cueBall->SetElasticity(0.7f);
+	m_cueBall->SetElasticity(0.6f);
 
 	m_physicsScene->AddActor(floor);
 	m_physicsScene->AddActor(floor1);
@@ -361,6 +377,79 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 
 	m_physicsScene->AddActor(m_cueBall);
 #endif // basic pool table situation
+
+#ifdef BouncePads
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Circle* ball = new Circle(glm::vec2(0, 20), glm::vec2(0), 5, 5, glm::vec4(1, 0, 1, 1));
+
+	Plane* net = new Plane(glm::vec2(0, 1), -30, glm::vec4(1, 1, 1, 1));
+	Box* floor = new Box(glm::vec2(0, 0), glm::vec2(0), 10, 50, 5, glm::vec4(1, 1, 1, 1));
+	floor->SetKinematic(true);
+	floor->SetElasticity(1);
+	ball->SetElasticity(1);
+
+	m_physicsScene->AddActor(net);
+	m_physicsScene->AddActor(ball);
+	m_physicsScene->AddActor(floor);
+
+#endif // bouncing ball
+
+#ifdef PhysicsBuckets
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Box* boxAngle = new Box(glm::vec2(0, 20), glm::vec2(0), 5, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
+	boxAngle->SetOrientation(DegreesToRadians(30));
+	Circle* circle3 = new Circle(glm::vec2(-20.3f, -16), glm::vec2(0), 5, 2, glm::vec4(1, 0, 1, 1));
+
+	Circle* circle1 = new Circle(glm::vec2(0, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
+	circle1->SetKinematic(true);
+	Circle* circle2 = new Circle(glm::vec2(-20, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
+	circle2->SetKinematic(true);
+	circle2->SetElasticity(0);
+
+
+	//m_physicsScene->AddActor(boxAngle);
+	m_physicsScene->AddActor(circle1);
+	m_physicsScene->AddActor(circle2);
+	m_physicsScene->AddActor(circle3);
+
+
+#endif // physics interactions
+
+#ifdef PachinkoTest
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	for (int i = 0; i <= 7; i++)
+	{
+		int k = 0;
+		for (int j = 7; j > 0; j--)
+		{
+			Circle* ball = new Circle(glm::vec2(glm::pow(-1, j) < 0 ? (i * -8) - 4 : i * -8, glm::pow(-1, j) < 0 ? (i + k) : k), glm::vec2(0), 7, 1, glm::vec4(0, 1, 0, 1));
+
+			ball->SetElasticity(0.3f);
+			ball->SetKinematic(true);
+			m_physicsScene->AddActor(ball);
+			k -= 6;
+		}
+	}
+
+	Circle* pachinkoBall = new Circle(glm::vec2(-20.7, 10), glm::vec2(0), 5, 0.8f, glm::vec4(1, 0, 1, 1));
+	m_physicsScene->AddActor(pachinkoBall);
+
+#endif
+
+#ifdef SpringIntro
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Circle* circle1 = new Circle(glm::vec2(-10, 0), glm::vec2(0), 8, 1, glm::vec4(0, 1, 0, 1));
+	circle1->SetKinematic(true);
+	Circle* circle2 = new Circle(glm::vec2(10, 0), glm::vec2(0), 8, 1, glm::vec4(0, 1, 0, 1));
+	
+	m_physicsScene->AddActor(circle1);
+	m_physicsScene->AddActor(circle2);
+
+#endif
 }
 
 #ifdef SimulatingRocket

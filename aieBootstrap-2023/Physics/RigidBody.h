@@ -17,24 +17,31 @@ public:
 	void ApplyForce(glm::vec2 _force, glm::vec2 _pos);
 	//void ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force, glm::vec2 _pos);
 
-	void ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm = nullptr);
+	void SetKinematic(bool _state) { m_isKinematic = _state; }
+	bool IsKinematic() { return m_isKinematic; }
+
+	void ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm = nullptr, float _pen = 0);
 	virtual float CalcKineticEnergy();
 	float CalcPotentialEnergy();
 	virtual float GetEnergy();
 
 	void CalculateSmoothedPosition(float _alpha);
 	void CalculateAxes();
+	glm::vec2 ToWorld(glm::vec2 _local, float _alpha);
 
 	// Getters
-	glm::vec2 GetPos() { return m_pos; }
+	glm::vec2 GetPos() const { return m_pos; }
 	glm::vec2 GetVel() { return m_vel; }
-	float GetMass() { return m_mass; }
+	float GetMass() { return m_isKinematic ? INT_MAX : m_mass; }
+
 	float GetOrientation() { return m_orientation; }
 	float GetAngularVel() { return m_angularVel; }
-	float GetMoment() { return m_moment; }
+	float GetMoment() { return m_isKinematic ? INT_MAX : m_moment; }
+
 	glm::vec4 GetColor() { return m_color; }
 	glm::vec2 GetLocalX() { return m_localX; }
 	glm::vec2 GetLocalY() { return m_localY; }
+
 	float GetLinearDrag() { return m_linearDrag; }
 	float GetAngularDrag() { return m_angularDrag; }
 
@@ -42,10 +49,13 @@ public:
 	void SetPos(glm::vec2 _pos) { m_pos = _pos; }
 	void SetVel(glm::vec2 _vel) { m_vel = _vel; }
 	void SetMass(float _mass) { m_mass = _mass; }
+
 	void SetOrientation(float _orientation) { m_orientation = _orientation; }
 	void SetAngularVel(float _angularVel) { m_angularVel = _angularVel; }
 	void SetMoment(float _moment) { m_moment = _moment; }
+
 	void SetColor(glm::vec4 _color) { m_color = _color; }
+
 	void SetLinearDrag(float _linearDrag) { m_linearDrag = _linearDrag; }
 	void SetAngularDrag(float _angularDrag) { m_angularDrag = _angularDrag; }
 
@@ -71,5 +81,7 @@ protected:
 
 	float m_linearDrag;
 	float m_angularDrag;
+
+	bool m_isKinematic;
 };
 

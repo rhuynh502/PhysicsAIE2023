@@ -30,6 +30,15 @@ RigidBody::~RigidBody()
 
 void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
+	CalculateAxes();
+
+	if (m_isKinematic)
+	{
+		m_vel = glm::vec2(0);
+		m_angularVel = 0;
+		return;
+	}
+
 	if (glm::length(m_vel) < MIN_LINEAR_THRESHOLD)
 	{
 		m_vel = glm::vec2(0, 0);
@@ -40,7 +49,6 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 		m_angularVel = 0;
 	}
 
-	CalculateAxes();
 	m_lastPos = m_pos;
 	m_lastOrientation = m_orientation;
 
@@ -68,7 +76,7 @@ void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 //	_actorOther->ApplyForce(_force);
 //}
 
-void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm)
+void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm, float _pen)
 {
 	// find vec normal or use provided one
 	glm::vec2 normal = glm::normalize(_collisionNorm ? *_collisionNorm : _actor2->GetPos() - m_pos);
@@ -83,18 +91,21 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 	if (v1 > v2) // moving closer
 	{
-		float mass1 = 1.0f / (1.0f / m_mass + (r1 * r1) / m_moment);
-		float mass2 = 1.0f / (1.0f / _actor2->m_mass + (r1 * r1) / _actor2->m_moment);
+		float mass1 = 1.0f / (1.0f / GetMass() + (r1 * r1) / GetMoment());
+		float mass2 = 1.0f / (1.0f / _actor2->GetMass() + (r1 * r1) / _actor2->GetMoment());
 
 		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2.0f;
 
 		float j = glm::dot(-(1 + elasticity) * (relVel), normal) /
-			glm::dot(normal, normal * ((1 / m_mass) + (1 / _actor2->GetMass())));
+			glm::dot(normal, normal * ((1 / GetMass()) + (1 / _actor2->GetMass())));
 
 		glm::vec2 force = normal * j;
 
 		ApplyForce(-force, _contact - m_pos);
 		_actor2->ApplyForce(force, _contact - _actor2->m_pos);
+
+		if (_pen > 0)
+			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);
 	}
 }
 
@@ -133,4 +144,9 @@ void RigidBody::CalculateAxes()
 	float cos = cosf(m_orientation);
 	m_localX = glm::vec2(cos, sin);
 	m_localY = glm::vec2(-sin, cos);
+}
+
+glm::vec2 RigidBody::ToWorld(glm::vec2 _local, float _alpha)
+{
+	return m_pos + m_localX * _local.x + m_localY * _local.y;
 }
