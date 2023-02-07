@@ -7,6 +7,8 @@
 #include "Circle.h"
 #include "Plane.h"
 #include "Box.h"
+#include "Spring.h"
+#include "SoftBody.h"
 
 #include "PhysicsScene.h"
 
@@ -123,6 +125,7 @@ void PhysicsApp::draw() {
 	// done drawing sprites
 	m_2dRenderer->end();
 }
+
 
 void PhysicsApp::DemoStartUp(int _demoNumber)
 {
@@ -442,14 +445,42 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 #ifdef SpringIntro
 	m_physicsScene->SetGravity(glm::vec2(0, -10));
 
-	Circle* circle1 = new Circle(glm::vec2(-10, 0), glm::vec2(0), 8, 1, glm::vec4(0, 1, 0, 1));
-	circle1->SetKinematic(true);
-	Circle* circle2 = new Circle(glm::vec2(10, 0), glm::vec2(0), 8, 1, glm::vec4(0, 1, 0, 1));
-	
-	m_physicsScene->AddActor(circle1);
-	m_physicsScene->AddActor(circle2);
+	Circle* prev = nullptr;
+	for (int i = 0; i < 15; i++)
+	{
+		Circle* circle = new Circle(glm::vec2(i * 3, 30 - i * 5), glm::vec2(0), 10, 2, glm::vec4(1, 0, 0, 1));
+		if ((i == 0))
+			circle->SetKinematic(true);
+		m_physicsScene->AddActor(circle);
+		if (prev)
+			m_physicsScene->AddActor(new Spring(circle, prev, 1200, 50, glm::vec4(1, 1, 1, 1), 5));
+		prev = circle;
+	}
+
+
+	Box* box = new Box(glm::vec2(0, -20), glm::vec2(0), 20, 8, 2, glm::vec4(0, 0, 1, 1));
+	box->SetKinematic(true);
+	box->SetOrientation(DegreesToRadians(90));
+	m_physicsScene->AddActor(box);
 
 #endif
+
+#ifdef SoftBodyIntro
+	std::vector<std::string> sb;
+	sb.push_back("000000");
+	sb.push_back("000000");
+	sb.push_back("00....");
+	sb.push_back("00....");
+	sb.push_back("000000");
+	sb.push_back("000000");
+
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	SoftBody::Build(m_physicsScene, glm::vec2(0), 0.8, 100, 5, sb);
+	Plane* floor = new Plane(glm::normalize(glm::vec2(0, 1)), -10, glm::vec4(1, 1, 1, 1));
+
+	m_physicsScene->AddActor(floor);
+#endif // intro to soft body
 }
 
 #ifdef SimulatingRocket

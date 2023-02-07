@@ -3,8 +3,12 @@
 #include <glm/glm.hpp>
 
 Spring::Spring(RigidBody* _body1, RigidBody* _body2,
-	float _springCoefficient, float _damping, float _restLength,
-	glm::vec2 _contact1, glm::vec2 _contact2)
+	float _springCoefficient, float _damping, 
+	glm::vec4 _color,
+	float _restLength,
+	glm::vec2 _contact1, glm::vec2 _contact2) :
+	PhysicsObject(JOINT)
+	
 {
 	m_body1 = _body1;
 	m_body2 = _body2;
@@ -21,6 +25,9 @@ Spring::Spring(RigidBody* _body1, RigidBody* _body2,
 		if (m_body2) m_body2->CalculateAxes();
 		m_restLength = glm::distance(GetContact1(1), GetContact2(1));
 	}
+	else
+		m_restLength = _restLength;
+	m_color = _color;
 }
 
 Spring::~Spring()
@@ -29,6 +36,9 @@ Spring::~Spring()
 
 void Spring::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
+	m_body1->CalculateSmoothedPosition(1);
+	m_body2->CalculateSmoothedPosition(1);
+
 	glm::vec2 p1 = GetContact1(1);
 	glm::vec2 p2 = GetContact2(1);
 
@@ -45,8 +55,9 @@ void Spring::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 
 void Spring::Draw(float _alpha)
 {
-	m_body1->CalculateSmoothedPosition(_alpha);
-	m_body2->CalculateSmoothedPosition(_alpha);
+
+	m_body1->ToWorldSmoothed(m_body1->GetPos());
+	m_body2->ToWorldSmoothed(m_body2->GetPos());
 
 	aie::Gizmos::add2DLine(GetContact1(_alpha), GetContact2(_alpha), glm::vec4(0.5f, 1, 0.3f, 1));
 }

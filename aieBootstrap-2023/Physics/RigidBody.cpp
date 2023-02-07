@@ -150,3 +150,8 @@ glm::vec2 RigidBody::ToWorld(glm::vec2 _local, float _alpha)
 {
 	return m_pos + m_localX * _local.x + m_localY * _local.y;
 }
+
+glm::vec2 RigidBody::ToWorldSmoothed(glm::vec2 _localPos)
+{
+	return m_smoothedPosition + m_smoothedLocalX * _localPos.x + m_smoothedLocalY * _localPos.y;
+}

@@ -28,6 +28,7 @@ public:
 	void CalculateSmoothedPosition(float _alpha);
 	void CalculateAxes();
 	glm::vec2 ToWorld(glm::vec2 _local, float _alpha);
+	glm::vec2 ToWorldSmoothed(glm::vec2 _localPos);
 
 	// Getters
 	glm::vec2 GetPos() const { return m_pos; }
@@ -83,5 +84,7 @@ protected:
 	float m_angularDrag;
 
 	bool m_isKinematic;
+
+	glm::vec2 m_worldSmooth;
 };
 

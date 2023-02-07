@@ -67,29 +67,10 @@ void PhysicsScene::Update(float _dt)
 		}
 		accumulatedTime -= m_timeStep;
 
-		CheckForCollision();
 
 #ifndef SimulatingRocket
-		int actorCount = m_actors.size();
-
-		for (int outer = 0; outer < actorCount - 1; outer++)
-		{
-			for (int inner = outer + 1; inner < actorCount; inner++)
-			{
-				PhysicsObject* obj1 = m_actors[outer];
-				PhysicsObject* obj2 = m_actors[inner];
-				int shapeID1 = obj1->GetShapeID();
-				int shapeID2 = obj2->GetShapeID();
-
-				// Use function pointers
-				int fnIndex = (shapeID1 * SHAPE_COUNT) + shapeID2;
-				fn collisionFunctionPtr = collisionFunctionArray[fnIndex];
-				if (collisionFunctionPtr != nullptr)
-				{
-					collisionFunctionPtr(obj1, obj2);
-				}
-			}
-		}
+		CheckForCollision();
+		
 #endif // !SimulatingRocket
 	}
 	GetTotalEnergy();
@@ -118,6 +99,14 @@ void PhysicsScene::CheckForCollision()
 
 			if (shapeId1 < 0 || shapeId2 < 0)
 				continue;
+
+			// Use function pointers
+			int fnIndex = (shapeId1 * SHAPE_COUNT) + shapeId2;
+			fn collisionFunctionPtr = collisionFunctionArray[fnIndex];
+			if (collisionFunctionPtr != nullptr)
+			{
+				collisionFunctionPtr(obj1, obj2);
+			}
 		}
 	}
 }
