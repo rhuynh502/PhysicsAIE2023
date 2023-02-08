@@ -23,14 +23,30 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 	glm::vec4 _color) :
 	RigidBody(BOX, _pos, _vel, 0.f, _mass, _color)
 {
-	m_pos = _pos;
-	m_vel = _vel;
-	m_mass = _mass;
 	m_width = _width;
 	m_height = _height;
-	m_color = _color;
 
 	m_extents = glm::vec2(_width / 2, _height / 2);
+
+	m_angularVel = 0;
+
+	m_moment = 1.0f / 12.0f * m_mass * m_width * m_height;
+
+	m_isKinematic = false;
+}
+
+Box::Box(glm::vec2 _pos, glm::vec2 _vel, 
+	float _orientation, 
+	float _mass, float _width, float _height, 
+	glm::vec4 _color) :
+	RigidBody(BOX, _pos, _vel, _orientation, _mass, _color)
+{
+	m_width = _width;
+	m_height = _height;
+
+	m_extents = glm::vec2(_width / 2, _height / 2);
+
+	m_angularVel = 0;
 
 	m_moment = 1.0f / 12.0f * m_mass * m_width * m_height;
 
@@ -117,6 +133,15 @@ bool Box::CheckBoxCorners(const Box& _box, glm::vec2& _contact, int& _numContact
 		res = true;
 	}
 	return res;
+}
+
+bool Box::IsInside(glm::vec2 _point)
+{
+	glm::vec2 p0(glm::dot(_point - m_pos, m_localX),
+		glm::dot(_point - m_pos, m_localY));
+
+	// p0 < extents.x
+	return p0.x <= m_extents.x && p0.x >= -m_extents.x && p0.y <= m_extents.y && p0.y >= -m_extents.y;
 }
 
 void Box::Draw(float _alpha)

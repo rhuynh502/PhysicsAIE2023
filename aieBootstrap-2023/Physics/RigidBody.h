@@ -2,6 +2,8 @@
 
 #include "PhysicsObject.h"
 #include <glm/glm.hpp>
+#include <functional>
+#include <list>
 
 class RigidBody : public PhysicsObject
 {
@@ -46,6 +48,8 @@ public:
 	float GetLinearDrag() { return m_linearDrag; }
 	float GetAngularDrag() { return m_angularDrag; }
 
+	bool GetTrigger() { return m_isTrigger; }
+
 	// Setters
 	void SetPos(glm::vec2 _pos) { m_pos = _pos; }
 	void SetVel(glm::vec2 _vel) { m_vel = _vel; }
@@ -59,6 +63,15 @@ public:
 
 	void SetLinearDrag(float _linearDrag) { m_linearDrag = _linearDrag; }
 	void SetAngularDrag(float _angularDrag) { m_angularDrag = _angularDrag; }
+
+	void SetTrigger(bool _isTrigger) { m_isTrigger = _isTrigger; }
+
+	std::function<void(PhysicsObject*)> collisionCallback;
+
+	void TriggerEnter(PhysicsObject* _actor);
+
+	std::function<void(PhysicsObject*)> triggerEnter;
+	std::function<void(PhysicsObject*)> triggerExit;
 
 protected:
 	glm::vec2 m_pos;
@@ -86,5 +99,9 @@ protected:
 	bool m_isKinematic;
 
 	glm::vec2 m_worldSmooth;
+
+	bool m_isTrigger;
+	std::list<PhysicsObject*> m_objectsInside;
+	std::list<PhysicsObject*> m_objectsInsideThisFrame;
 };
 

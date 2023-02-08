@@ -19,6 +19,8 @@ public:
 	// Setters
 	void SetRadius(float _radius) { m_radius = _radius; }
 
+	bool IsInside(glm::vec2 _point);
+
 protected:
 	float m_radius;
 

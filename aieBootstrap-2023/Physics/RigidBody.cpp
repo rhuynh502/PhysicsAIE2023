@@ -4,10 +4,12 @@
 #include "PhysicsScene.h"
 
 #define MIN_LINEAR_THRESHOLD 0.099f
-#define MIN_ANGULAR_THRESHOLD 0.01f
+#define MIN_ANGULAR_THRESHOLD 0.02f
 
 RigidBody::RigidBody()
 {
+	m_isTrigger = false;
+	m_isKinematic = false;
 }
 
 RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _orientation, float _mass, glm::vec4 _color = glm::vec4(0, 0, 0, 0))
@@ -20,8 +22,10 @@ RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _
 	m_color = _color;
 	m_angularVel = 0;
 	m_linearDrag = 0.3f;
-	m_angularDrag = 0.3f;
+	m_angularDrag = 0.4f;
 	m_elasticity = 1.f;
+	m_isKinematic = false;
+	m_isTrigger = false;
 }
 
 RigidBody::~RigidBody()
@@ -31,6 +35,23 @@ RigidBody::~RigidBody()
 void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
 	CalculateAxes();
+
+	if (m_isTrigger)
+	{
+		for (auto it = m_objectsInside.begin(); it != m_objectsInside.end(); it++)
+		{
+			if (std::find(m_objectsInsideThisFrame.begin(), m_objectsInsideThisFrame.end(), *it) == m_objectsInsideThisFrame.end())
+			{
+				if (triggerExit)
+					triggerExit(*it);
+				it = m_objectsInside.erase(it);
+				if (it == m_objectsInside.end())
+					break;
+			}
+		}
+	}
+
+	m_objectsInsideThisFrame.clear();
 
 	if (m_isKinematic)
 	{
@@ -78,6 +99,9 @@ void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 
 void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm, float _pen)
 {
+	m_objectsInsideThisFrame.push_back(_actor2);
+	_actor2->m_objectsInsideThisFrame.push_back(this);
+
 	// find vec normal or use provided one
 	glm::vec2 normal = glm::normalize(_collisionNorm ? *_collisionNorm : _actor2->GetPos() - m_pos);
 	glm::vec2 relVel = _actor2->GetVel() - m_vel;
@@ -101,8 +125,27 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 		glm::vec2 force = normal * j;
 
-		ApplyForce(-force, _contact - m_pos);
-		_actor2->ApplyForce(force, _contact - _actor2->m_pos);
+		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+
+		if (!m_isTrigger && !_actor2->m_isTrigger)
+		{
+			ApplyForce(-force, _contact - m_pos);
+			_actor2->ApplyForce(force, _contact - _actor2->m_pos);
+
+			if (collisionCallback != nullptr)
+				collisionCallback(_actor2);
+			if (_actor2->collisionCallback)
+				_actor2->collisionCallback(this);
+		}
+		else
+		{
+			TriggerEnter(_actor2);
+			_actor2->TriggerEnter(this);
+		}
+
+		float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+		if (kePost - kePre > kePost * 0.01f)
+			std::cout << "kinetic energy discrepancy\n";
 
 		if (_pen > 0)
 			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);
@@ -154,4 +197,14 @@ glm::vec2 RigidBody::ToWorld(glm::vec2 _local, float _alpha)
 glm::vec2 RigidBody::ToWorldSmoothed(glm::vec2 _localPos)
 {
 	return m_smoothedPosition + m_smoothedLocalX * _localPos.x + m_smoothedLocalY * _localPos.y;
+}
+
+void RigidBody::TriggerEnter(PhysicsObject* _actor)
+{
+	if (m_isTrigger && std::find(m_objectsInside.begin(), m_objectsInside.end(), _actor) == m_objectsInside.end())
+	{
+		m_objectsInside.push_back(_actor);
+		if (triggerEnter != nullptr)
+			triggerEnter(_actor);
+	}
 }

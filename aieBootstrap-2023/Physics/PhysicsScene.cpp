@@ -3,6 +3,7 @@
 #include "Plane.h"
 #include "Demos.h"
 #include "Box.h"
+#include "Input.h"
 #include <iostream>
 
 typedef bool(*fn)(PhysicsObject*, PhysicsObject*);
@@ -124,6 +125,9 @@ float PhysicsScene::GetTotalEnergy()
 
 void PhysicsScene::ApplyContactForces(RigidBody* _body1, RigidBody* _body2, glm::vec2 _norm, float _pen)
 {
+	if ((_body1 && _body1->GetTrigger()) || (_body2 && _body2->GetTrigger()))
+		return;
+
 	float body2Mass = _body2 ? _body2->GetMass() : INT_MAX;
 
 	float body1Factor = body2Mass / (_body1->GetMass() + body2Mass);

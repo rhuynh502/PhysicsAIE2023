@@ -11,13 +11,22 @@ Plane::Plane() : PhysicsObject(ShapeType::PLANE)
 	m_elasticity = 1;
 }
 
-Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) 
+Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) :
+	PhysicsObject(ShapeType::PLANE)
 {
 	m_normal = _normal;
 	m_distanceToOrigin = _distance;
 	m_color = _color;
-	m_shapeID = ShapeType::PLANE;
 	m_elasticity = 1;
+}
+
+Plane::Plane(glm::vec2 _normal, float _distance) : 
+	PhysicsObject(ShapeType::PLANE)
+{
+	m_normal = _normal;
+	m_distanceToOrigin = _distance;
+	m_elasticity = 1;
+	m_color = glm::vec4(1, 1, 1, 1);
 }
 
 Plane::~Plane()
@@ -69,6 +78,9 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 
 	float kePre = _actor->CalcKineticEnergy();
 	_actor->ApplyForce(force, _contact - _actor->GetPos());
+
+	if (_actor->collisionCallback)
+		_actor->collisionCallback(this);
 
 	float pen = glm::dot(_contact, m_normal) - m_distanceToOrigin;
 	PhysicsScene::ApplyContactForces(_actor, nullptr, m_normal, pen);

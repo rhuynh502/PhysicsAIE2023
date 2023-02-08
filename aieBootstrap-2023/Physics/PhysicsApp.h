@@ -35,6 +35,13 @@ public:
 	void DemoStartUp(int _demoNumber);
 	void DemoUpdate(aie::Input* _input, float _dt);
 	float DegreesToRadians(float _degrees);
+	glm::vec2 ScreenToWorld(glm::vec2 _screenPos);
+
+	const float m_extents = 100;
+	const float m_aspectRatio = 16.0f / 9.0f;
+
+	float m_cameraX;
+	float m_cameraY;
 
 #ifdef SimulatingRocket
 	Circle* m_rocket;
@@ -49,6 +56,7 @@ public:
 	Circle* m_cueBall;
 	glm::vec2 m_appliedForce = glm::vec2(0);
 	glm::vec2 m_initialPos;
+	float m_score = 0;
 	bool m_onClick = false;
 #endif
 };

@@ -19,4 +19,6 @@
 //#define PhysicsBuckets
 //#define PachinkoTest
 //#define SpringIntro
-#define SoftBodyIntro
+//#define SoftBodyIntro
+//#define ObjectTest
+#define Pachinko

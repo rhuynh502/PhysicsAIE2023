@@ -36,13 +36,13 @@ void SoftBody::Build(PhysicsScene* _scene, glm::vec2 _pos, float _damping, float
 			Circle* s10 = circles[i * numCols + j - 1];
 			Circle* s00 = circles[(i - 1) * numCols + j - 1];
 
-			if (s11 && s01)
+			if (s11 && s01 && glm::distance(s11->GetPos(), s01->GetPos()) <= _spacing)
 				_scene->AddActor(new Spring(s11, s01, _springForce, _damping, glm::vec4(1, 1, 1, 1), _spacing));
-			if (s11 && s10)
+			if (s11 && s10 && glm::distance(s11->GetPos(), s10->GetPos()) <= _spacing)
 				_scene->AddActor(new Spring(s11, s10, _springForce, _damping, glm::vec4(1, 1, 1, 1), _spacing));
-			if (s10 && s00)
+			if (s10 && s00 && glm::distance(s10->GetPos(), s00->GetPos()) <= _spacing)
 				_scene->AddActor(new Spring(s10, s00, _springForce, _damping, glm::vec4(1, 1, 1, 1), _spacing));
-			if (s01 && s00)
+			if (s01 && s00 && glm::distance(s01->GetPos(), s00->GetPos()) <= _spacing)
 				_scene->AddActor(new Spring(s01, s00, _springForce, _damping, glm::vec4(1, 1, 1, 1), _spacing));
 
 			if (s11 && s00)
@@ -55,7 +55,7 @@ void SoftBody::Build(PhysicsScene* _scene, glm::vec2 _pos, float _damping, float
 
 			Circle* s22 = (!endOfI && !endOfJ) ? circles[(i + 1) * numCols + (j + 1)] : nullptr;
 			Circle* s02 = !endOfJ ? circles[(i - 1) * numCols + (j + 1)] : nullptr;
-			Circle* s20 = !endOfI ? circles[(i + 1) * numCols + (j - 1)] : nullptr;
+			Circle* s20 = !endOfI ? circles[(i + 1) * numCols + j - 1] : nullptr;
 
 			if(s00 && s02)
 				_scene->AddActor(new Spring(s00, s02, _springForce, _damping, glm::vec4(1, 1, 1, 1), _spacing * 2));

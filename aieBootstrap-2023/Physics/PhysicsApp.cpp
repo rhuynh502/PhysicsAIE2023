@@ -9,13 +9,16 @@
 #include "Box.h"
 #include "Spring.h"
 #include "SoftBody.h"
+#include <iostream>
 
 #include "PhysicsScene.h"
 
 #include <glm/ext.hpp>
 
-PhysicsApp::PhysicsApp() {
-
+PhysicsApp::PhysicsApp() 
+{
+	m_cameraX = 0;
+	m_cameraY = 0;
 }
 
 PhysicsApp::~PhysicsApp() {
@@ -57,6 +60,15 @@ void PhysicsApp::update(float deltaTime) {
 	m_physicsScene->Draw();
 
 	DemoUpdate(input, deltaTime);
+
+	if (input->isMouseButtonDown(0))
+	{
+		int xScreen, yScreen;
+		input->getMouseXY(&xScreen, &yScreen);
+		glm::vec2 worldPos = ScreenToWorld(glm::vec2(xScreen, yScreen));
+
+		aie::Gizmos::add2DCircle(worldPos, 5, 32, glm::vec4(0, 0, 1, 1));
+	}
 
 #ifdef SimulatingRocket
 
@@ -111,13 +123,16 @@ void PhysicsApp::draw() {
 	// wipe the screen to the background colour
 	clearScreen();
 
+	// Set camera pos before rendering
+	m_2dRenderer->setCameraPos(m_cameraX, m_cameraY);
+
 	// begin drawing sprites
 	m_2dRenderer->begin();
 
 	// draw your stuff here!
-	static float aspectRatio = 16.f / 9.f;
-	aie::Gizmos::draw2D(glm::ortho<float>(-100, 100,
-		-100 / aspectRatio, 100 / aspectRatio, -1.f, 1.f));
+
+	aie::Gizmos::draw2D(glm::ortho<float>(-m_extents, m_extents,
+		-m_extents / m_aspectRatio, m_extents / m_aspectRatio, -1.f, 1.f));
 
 	// output some text, uses the last used colour
 	m_2dRenderer->drawText(m_font, "Press ESC to quit", 0, 0);
@@ -373,6 +388,16 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_cueBall = new Circle(glm::vec2(45, 0), glm::vec2(0, 0), 5, 0.8f, glm::vec4(1, 0, 1, 1));
 	m_cueBall->SetElasticity(0.6f);
 
+	for (int i = -1; i < 2; i += 2)
+	{
+		for (int j = -1; j < 2; j++)
+		{
+			Circle* pocket = new Circle(glm::vec2(56 * j, 28 * i), glm::vec2(0), 1, 2, glm::vec4(1, 0, 1, 1));
+			
+			m_physicsScene->AddActor(pocket);
+		}
+	}
+
 	m_physicsScene->AddActor(floor);
 	m_physicsScene->AddActor(floor1);
 	m_physicsScene->AddActor(floor2);
@@ -467,20 +492,87 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 
 #ifdef SoftBodyIntro
 	std::vector<std::string> sb;
+	sb.push_back("00..00");
+	sb.push_back("00..00");
+	sb.push_back("00000.");
+	sb.push_back("00..00");
+	sb.push_back("000000");
+	sb.push_back(".0000.");
+
+	SoftBody::Build(m_physicsScene, glm::vec2(-60, 10), 0.8, 100, 5, sb);
+
+	sb.clear();
+	sb.push_back("..00..");
+	sb.push_back("..00..");
+	sb.push_back("..00..");
+	sb.push_back("000000");
+	sb.push_back("00..00");
+	sb.push_back("00..00");
+
+	SoftBody::Build(m_physicsScene, glm::vec2(-20, 10), 0.8, 100, 5, sb);
+
+	sb.clear();
+	sb.push_back("00..00");
+	sb.push_back("00..00");
+	sb.push_back("000000");
+	sb.push_back("00..00");
+	sb.push_back(".0000.");
+	sb.push_back("..00..");
+
+	SoftBody::Build(m_physicsScene, glm::vec2(20, 10), 0.8, 100, 5, sb);
+	
+	sb.clear();
+	sb.push_back("00..00");
+	sb.push_back("00.000");
 	sb.push_back("000000");
 	sb.push_back("000000");
-	sb.push_back("00....");
-	sb.push_back("00....");
-	sb.push_back("000000");
-	sb.push_back("000000");
+	sb.push_back("000.00");
+	sb.push_back("00..00");
+	SoftBody::Build(m_physicsScene, glm::vec2(60, 10), 0.8, 100, 5, sb);
 
 	m_physicsScene->SetGravity(glm::vec2(0, -10));
 
-	SoftBody::Build(m_physicsScene, glm::vec2(0), 0.8, 100, 5, sb);
 	Plane* floor = new Plane(glm::normalize(glm::vec2(0, 1)), -10, glm::vec4(1, 1, 1, 1));
 
 	m_physicsScene->AddActor(floor);
 #endif // intro to soft body
+
+#ifdef ObjectTest
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Circle* ball1 = new Circle(glm::vec2(-20, 0), glm::vec2(0), 4.0f, 4, glm::vec4(1, 0, 0, 1));
+	Circle* ball2 = new Circle(glm::vec2(10, -20), glm::vec2(0), 4.0f, 4, glm::vec4(0, 1, 0, 1));
+	ball2->SetKinematic(true);
+	ball2->SetTrigger(true);
+
+	m_physicsScene->AddActor(ball1);
+	m_physicsScene->AddActor(ball2);
+	m_physicsScene->AddActor(new Plane(glm::vec2(0, 1), -30));
+	m_physicsScene->AddActor(new Plane(glm::vec2(1, 0), -50));
+	m_physicsScene->AddActor(new Plane(glm::vec2(-1, 0), -50));
+	m_physicsScene->AddActor(new Box(glm::vec2(5, 10), glm::vec2(3, 0), 0.5f, 4, 8, 4, glm::vec4(1, 1, 0, 1)));
+	m_physicsScene->AddActor(new Box(glm::vec2(-40, 10), glm::vec2(3, 0), 0.5f, 4, 8, 4, glm::vec4(1, 0, 1, 1)));
+
+	ball2->triggerEnter = [=](PhysicsObject* other) { std::cout << "Enter:" << other << std::endl; };
+	ball2->triggerExit = [=](PhysicsObject* other) { std::cout << "Exit:" << other << std::endl; };
+#endif // testing objects
+
+#ifdef Pachinko
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = i % 2 ? 4 : 5; j > 0; j--)
+		{
+			Circle* pin = new Circle(glm::vec2(-22.5f + (7 * j) + (3.5f * (i % 2)), 50 - (6 * i)), glm::vec2(0), 1, 1, glm::vec4(0, 1, 0, 1));
+			pin->SetKinematic(true);
+			pin->SetElasticity(0.25f);
+
+			m_physicsScene->AddActor(pin);
+		}
+	}
+
+#endif // actual pachinko
 }
 
 #ifdef SimulatingRocket
@@ -536,4 +628,17 @@ void PhysicsApp::DemoUpdate(aie::Input* _input, float _dt)
 float PhysicsApp::DegreesToRadians(float _degrees)
 {
 	return _degrees * (PI / 180.f);
+}
+
+glm::vec2 PhysicsApp::ScreenToWorld(glm::vec2 _screenPos)
+{
+	glm::vec2 worldPos = _screenPos;
+
+	worldPos.x -= getWindowWidth() / 2;
+	worldPos.y -= getWindowHeight() / 2;
+
+	worldPos.x *= 2.0f * m_extents / getWindowWidth();
+	worldPos.y *= 2.0f * m_extents / (m_aspectRatio * getWindowHeight());
+
+	return worldPos;
 }

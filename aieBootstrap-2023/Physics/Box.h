@@ -11,9 +11,15 @@ public:
 	Box(glm::vec2 _pos, glm::vec2 _vel,
 		float _mass, float _width, float _height,
 		glm::vec4 _color);
+	Box(glm::vec2 _pos, glm::vec2 _vel,
+		float _orientation,
+		float _mass, float _width, float _height,
+		glm::vec4 _color);
 	~Box();
 
 	bool CheckBoxCorners(const Box& _box, glm::vec2& _contact, int& _numContacts, float& _pen, glm::vec2& _edgeNormal);
+
+	bool IsInside(glm::vec2 _point);
 
 	virtual void Draw(float _alpha);
 

@@ -7,6 +7,7 @@ class Plane : public PhysicsObject
 public:
 	Plane();
 	Plane(glm::vec2 _normal, float _distance, glm::vec4 _color);
+	Plane(glm::vec2 _normal, float _distance);
 	~Plane();
 
 	virtual void FixedUpdate(glm::vec2 _gravity, float _timeStep);
