@@ -19,6 +19,7 @@ public:
 	void ApplyForce(glm::vec2 _force, glm::vec2 _pos);
 	//void ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force, glm::vec2 _pos);
 
+
 	void SetKinematic(bool _state) { m_isKinematic = _state; }
 	bool IsKinematic() { return m_isKinematic; }
 

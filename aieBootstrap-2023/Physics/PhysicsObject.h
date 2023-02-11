@@ -31,12 +31,19 @@ public:
 	// Getters
 	int GetShapeID() { return m_shapeID; }
 	float GetElasticity() { return m_elasticity; }
+	float GetStaticFriction() { return m_staticFriction; }
+	float GetKineticFriction() { return m_kinecticFriction; }
 
 	// Setters
 	void SetElasticity(float _elasticity) { m_elasticity = _elasticity; }
+	void SetStaticFriction(float _staticFriction) { m_staticFriction = _staticFriction; }
+	void SetKineticFriction(float _kinecticFriction) { m_kinecticFriction = _kinecticFriction; }
 
 protected:
 	ShapeType m_shapeID;
 	float m_elasticity;
+
+	float m_staticFriction;
+	float m_kinecticFriction;
 };
 

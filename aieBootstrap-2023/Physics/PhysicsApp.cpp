@@ -575,6 +575,37 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 
 
 #endif // actual pachinko
+
+#ifdef StaticFriction
+	m_physicsScene->SetGravity(glm::vec2(0, -10));
+
+	Plane* slope = new Plane(glm::normalize(glm::vec2(0.5f, 1.f)), 0);
+	slope->SetStaticFriction(0.8f);
+	slope->SetKineticFriction(0.8f);
+	Plane* floor = new Plane(glm::normalize(glm::vec2(0, 1)), -2);
+	floor->SetStaticFriction(0.2f);
+	floor->SetKineticFriction(0.8f);
+	Plane* slope1 = new Plane(glm::normalize(glm::vec2(-0.5f, 1)), -9);
+	slope1->SetStaticFriction(0.8f);
+	slope1->SetKineticFriction(0.8f);
+
+	Circle* ball = new Circle(glm::vec2(-18, 12), glm::vec2(0), 50, 3, glm::vec4(1, 0, 0, 1));
+	ball->SetStaticFriction(0.2f);
+	ball->SetKineticFriction(0.2f);
+	ball->SetElasticity(0.4f);
+
+	Box* box = new Box(glm::vec2(9, 18), glm::vec2(0), 50, 4, 4, glm::vec4(1, 0, 0, 1));
+	box->SetStaticFriction(0.2f);
+	box->SetKineticFriction(0.2f);
+	box->SetElasticity(0.5f);
+
+	m_physicsScene->AddActor(slope);
+	m_physicsScene->AddActor(floor);
+	m_physicsScene->AddActor(slope1);
+	m_physicsScene->AddActor(ball);
+	m_physicsScene->AddActor(box);
+
+#endif
 }
 
 #ifdef SimulatingRocket

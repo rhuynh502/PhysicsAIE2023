@@ -3,8 +3,8 @@
 #include "glm/glm.hpp"
 #include "PhysicsScene.h"
 
-#define MIN_LINEAR_THRESHOLD 0.099f
-#define MIN_ANGULAR_THRESHOLD 0.02f
+#define MIN_LINEAR_THRESHOLD 0.09970000001f
+#define MIN_ANGULAR_THRESHOLD 0.03f
 
 RigidBody::RigidBody()
 {
@@ -88,7 +88,9 @@ void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 {
 	m_vel += _force / GetMass();
 
-	m_angularVel += (_force.y * _pos.x - _force.x * _pos.y) / GetMoment();
+	float totForce = _force.y * _pos.x - _force.x * _pos.y;
+
+	m_angularVel += totForce / GetMoment();
 }
 
 //void RigidBody::ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force)
@@ -110,27 +112,33 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 	float r1 = glm::dot(_contact - m_pos, -perp);
 	float r2 = glm::dot(_contact - _actor2->m_pos, perp);
 
-	float v1 = glm::dot(m_vel, normal) - r1 * m_angularVel;
-	float v2 = glm::dot(_actor2->m_vel, normal) + r2 * _actor2->m_angularVel;
+	float v1 = glm::dot(m_vel, normal) - r1 * GetAngularVel();
+	float v2 = glm::dot(_actor2->m_vel, normal) + r2 * _actor2->GetAngularVel();
 
 	if (v1 > v2) // moving closer
 	{
 		float mass1 = 1.0f / (1.0f / GetMass() + (r1 * r1) / GetMoment());
-		float mass2 = 1.0f / (1.0f / _actor2->GetMass() + (r1 * r1) / _actor2->GetMoment());
+		float mass2 = 1.0f / (1.0f / _actor2->GetMass() + (r2 * r2) / _actor2->GetMoment());
 
 		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2.0f;
 
 		float j = glm::dot(-(1 + elasticity) * (relVel), normal) /
 			glm::dot(normal, normal * ((1 / GetMass()) + (1 / _actor2->GetMass())));
 
-		glm::vec2 force = normal * j;
+		//glm::vec2 force = normal * j;
+		glm::vec2 force = (1.0f + elasticity) * mass1 * mass2 /
+			(mass1 + mass2) * (v1 - v2) * normal;
 
 		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
 		if (!m_isTrigger && !_actor2->m_isTrigger)
 		{
+			glm::vec2 gravVec = PhysicsScene::GetGravity();
+			float gravity = glm::sqrt(gravVec.x * gravVec.x + gravVec.y * gravVec.y);
+
 			ApplyForce(-force, _contact - m_pos);
 			_actor2->ApplyForce(force, _contact - _actor2->m_pos);
+			
 
 			if (collisionCallback != nullptr)
 				collisionCallback(_actor2);
