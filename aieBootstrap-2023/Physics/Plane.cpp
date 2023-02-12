@@ -9,6 +9,8 @@ Plane::Plane() : PhysicsObject(ShapeType::PLANE)
 	m_distanceToOrigin = 0;
 	m_normal = glm::vec2(0, 1);
 	m_elasticity = 1;
+	m_staticFriction = 0;
+	m_kinecticFriction = 0;
 }
 
 Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) :
@@ -18,6 +20,8 @@ Plane::Plane(glm::vec2 _normal, float _distance, glm::vec4 _color) :
 	m_distanceToOrigin = _distance;
 	m_color = _color;
 	m_elasticity = 1;
+	m_staticFriction = 0;
+	m_kinecticFriction = 0;
 }
 
 Plane::Plane(glm::vec2 _normal, float _distance) : 
@@ -27,6 +31,8 @@ Plane::Plane(glm::vec2 _normal, float _distance) :
 	m_distanceToOrigin = _distance;
 	m_elasticity = 1;
 	m_color = glm::vec4(1, 1, 1, 1);
+	m_staticFriction = 0;
+	m_kinecticFriction = 0;
 }
 
 Plane::~Plane()

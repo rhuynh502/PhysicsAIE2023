@@ -10,6 +10,8 @@ RigidBody::RigidBody()
 {
 	m_isTrigger = false;
 	m_isKinematic = false;
+	m_staticFriction = 0;
+	m_kinecticFriction = 0;
 }
 
 RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _orientation, float _mass, glm::vec4 _color = glm::vec4(0, 0, 0, 0))
@@ -26,6 +28,8 @@ RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _
 	m_elasticity = 1.f;
 	m_isKinematic = false;
 	m_isTrigger = false;
+	m_staticFriction = 0;
+	m_kinecticFriction = 0;
 }
 
 RigidBody::~RigidBody()
