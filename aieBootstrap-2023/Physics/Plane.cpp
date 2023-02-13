@@ -84,9 +84,7 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 
 	float kePre = _actor->CalcKineticEnergy();
 	
-	/*float grav = PhysicsScene::GetGravity().y;
-	float forceOnActor = grav * _actor->GetMass();
-	float gradient = -m_normal.y / m_normal.x;
+	/*float gradient = -m_normal.y / m_normal.x;
 	float forceParallel = std::abs(forceOnActor * glm::sin(gradient));
 	float forcePerpendicular = forceOnActor * glm::cos(gradient);
 	float forceNormal = m_staticFriction * forcePerpendicular;
@@ -94,21 +92,21 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 	float netForce = forceParallel - forceNormal;
 	float kineticForce = forceParallel - forceKinetic;*/
 	//direction of most amouynt of frictoin is rotation
+
+	// angular acceleration = 2/3r * g sin(theta) for a circle
+	// or frction / moment
+	// friction = coefficentkinecticfriction * m * g * cos(theta)
+
+	float theta = glm::tan(m_normal.y == 0 || m_normal.x == 0 ? 1 : -m_normal.x / m_normal.y);
+	glm::vec2 fricForce = _actor->GetKineticFriction() *
+		_actor->GetMass() * PhysicsScene::GetGravity() * 
+		glm::cos(theta);
+
+	float angularVel = _actor->GetAngularVel();
 	
-	/*float totForce = glm::distance(force, glm::vec2(0));
+	glm::vec2 rotForce(angularVel * cos(theta), angularVel * sin(theta));
 
-	if (_actor->GetVel() == glm::vec2(0))
-	{
-		if (totForce > netForce)
-		{*/
-			_actor->ApplyForce(force, _contact - _actor->GetPos());
-
-		/*}
-	}
-	else
-	{
-		_actor->ApplyForce(force - glm::vec2(kineticForce * -cos(gradient), kineticForce * sin(gradient)), _contact - _actor->GetPos());
-	}*/
+	_actor->ApplyForce(force - fricForce - rotForce, _contact - _actor->GetPos());
 
 	if (_actor->collisionCallback)
 		_actor->collisionCallback(this);
@@ -119,5 +117,8 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 	float kePost = _actor->CalcKineticEnergy();
 
 	if (kePost - kePre > kePost * 0.01f)
-		std::cout << "Kinetic Energy discrepancy";
+	{
+		std::cout << "Kinetic Energy discrepancy\n";
+		std::cout << "preKE " << kePre << " postKE " << kePost << "\n";
+	}
 }

@@ -61,13 +61,17 @@ void PhysicsApp::update(float deltaTime) {
 
 	DemoUpdate(input, deltaTime);
 
-	if (input->isMouseButtonDown(0))
+	if (input->wasMouseButtonPressed(0))
 	{
 		int xScreen, yScreen;
 		input->getMouseXY(&xScreen, &yScreen);
 		glm::vec2 worldPos = ScreenToWorld(glm::vec2(xScreen, yScreen));
 
 		aie::Gizmos::add2DCircle(worldPos, 5, 32, glm::vec4(0, 0, 1, 1));
+		/*Circle* ball = new Circle(worldPos, glm::vec2(0), 5, 0.9f, glm::vec4(1, 0, 1, 1));
+		ball->SetElasticity(0.2f);
+		ball->SetKineticFriction(0.4f);
+		m_physicsScene->AddActor(ball);*/
 	}
 
 #ifdef SimulatingRocket
@@ -393,7 +397,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 		for (int j = -1; j < 2; j++)
 		{
 			Circle* pocket = new Circle(glm::vec2(56 * j, 28 * i), glm::vec2(0), 1, 2, glm::vec4(1, 0, 1, 1));
-			
+			pocket->SetKinematic(true);
 			m_physicsScene->AddActor(pocket);
 		}
 	}
@@ -428,19 +432,22 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 
 	Box* boxAngle = new Box(glm::vec2(0, 20), glm::vec2(0), 5, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
 	boxAngle->SetOrientation(DegreesToRadians(30));
-	Circle* circle3 = new Circle(glm::vec2(-20.3f, -16), glm::vec2(0), 5, 2, glm::vec4(1, 0, 1, 1));
+	boxAngle->SetElasticity(0.5f);
+	Circle* circle3 = new Circle(glm::vec2(-20.3f, 20), glm::vec2(0), 5, 2, glm::vec4(1, 0, 1, 1));
 
 	Circle* circle1 = new Circle(glm::vec2(0, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
 	circle1->SetKinematic(true);
-	Circle* circle2 = new Circle(glm::vec2(-20, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
+	circle1->SetKineticFriction(0.3f);
+	circle1->SetElasticity(0.4f);
+	Box* circle2 = new Box(glm::vec2(-20, -20), glm::vec2(0), 5, 2, 2, glm::vec4(1, 1, 1, 1));
 	circle2->SetKinematic(true);
 	circle2->SetElasticity(0);
 
 
-	//m_physicsScene->AddActor(boxAngle);
+	m_physicsScene->AddActor(boxAngle);
 	m_physicsScene->AddActor(circle1);
 	m_physicsScene->AddActor(circle2);
-	m_physicsScene->AddActor(circle3);
+	//m_physicsScene->AddActor(circle3);
 
 
 #endif // physics interactions
@@ -453,18 +460,20 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 		int k = 0;
 		for (int j = 7; j > 0; j--)
 		{
-			Circle* ball = new Circle(glm::vec2(glm::pow(-1, j) < 0 ? (i * -8) - 4 : i * -8, glm::pow(-1, j) < 0 ? (i + k) : k), glm::vec2(0), 7, 1, glm::vec4(0, 1, 0, 1));
+			Circle* ball = new Circle(glm::vec2(glm::pow(-1, j) < 0 ? (i * -8) - 4 : i * -8, glm::pow(-1, j) < 0 ? (i + k) : k), glm::vec2(0), 7, 0.7f, glm::vec4(0, 1, 0, 1));
 
 			ball->SetElasticity(0.3f);
+			ball->SetKineticFriction(0.4f);
 			ball->SetKinematic(true);
 			m_physicsScene->AddActor(ball);
 			k -= 6;
 		}
 	}
 
-	Circle* pachinkoBall = new Circle(glm::vec2(-20.7, 10), glm::vec2(0), 5, 0.8f, glm::vec4(1, 0, 1, 1));
+	Circle* pachinkoBall = new Circle(glm::vec2(-24.7, 20), glm::vec2(0), 5, 0.9f, glm::vec4(1, 0, 1, 1));
+	pachinkoBall->SetKineticFriction(0.2f);
+	pachinkoBall->SetElasticity(0.7f);
 	m_physicsScene->AddActor(pachinkoBall);
-
 #endif
 
 #ifdef SpringIntro
@@ -589,7 +598,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	slope1->SetStaticFriction(0.8f);
 	slope1->SetKineticFriction(0.8f);
 
-	Circle* ball = new Circle(glm::vec2(-18, 12), glm::vec2(0), 50, 3, glm::vec4(1, 0, 0, 1));
+	Circle* ball = new Circle(glm::vec2(-25, 19), glm::vec2(0), 50, 3, glm::vec4(1, 0, 0, 1));
 	ball->SetStaticFriction(0.2f);
 	ball->SetKineticFriction(0.2f);
 	ball->SetElasticity(0.4f);
@@ -601,9 +610,9 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 
 	m_physicsScene->AddActor(slope);
 	m_physicsScene->AddActor(floor);
-	m_physicsScene->AddActor(slope1);
+	//m_physicsScene->AddActor(slope1);
 	m_physicsScene->AddActor(ball);
-	m_physicsScene->AddActor(box);
+	//m_physicsScene->AddActor(box);
 
 #endif
 }

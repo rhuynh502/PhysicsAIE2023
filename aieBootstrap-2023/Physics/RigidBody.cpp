@@ -40,6 +40,13 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
 	CalculateAxes();
 
+	if (m_isKinematic)
+	{
+		m_vel = glm::vec2(0);
+		m_angularVel = 0;
+		return;
+	}
+
 	if (m_isTrigger)
 	{
 		for (auto it = m_objectsInside.begin(); it != m_objectsInside.end(); it++)
@@ -56,13 +63,6 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 	}
 
 	m_objectsInsideThisFrame.clear();
-
-	if (m_isKinematic)
-	{
-		m_vel = glm::vec2(0);
-		m_angularVel = 0;
-		return;
-	}
 
 	if (glm::length(m_vel) < MIN_LINEAR_THRESHOLD)
 	{
@@ -129,20 +129,25 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 		float j = glm::dot(-(1 + elasticity) * (relVel), normal) /
 			glm::dot(normal, normal * ((1 / GetMass()) + (1 / _actor2->GetMass())));
 
-		//glm::vec2 force = normal * j;
-		glm::vec2 force = (1.0f + elasticity) * mass1 * mass2 /
-			(mass1 + mass2) * (v1 - v2) * normal;
+		// glm::dot(-(1 + elasticity) * (relVel), normal) /
+		// glm::dot(((_contact - m_pos) * normal) * (_contact - m_pos) / GetMoment() + ((_contact - _actor2->m_pos) * normal) * (_contact - _actor2->m_pos) / _actor2->GetMoment(), normal) + ((1 / GetMass()) + (1 / _actor2->GetMass()));
+
+		glm::vec2 force = normal * j;
 
 		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
 		if (!m_isTrigger && !_actor2->m_isTrigger)
 		{
-			glm::vec2 gravVec = PhysicsScene::GetGravity();
-			float gravity = glm::sqrt(gravVec.x * gravVec.x + gravVec.y * gravVec.y);
+			// (GetKineticFriction() >= _actor2->GetKineticFriction() ? GetKineticFriction() : _actor2->GetKineticFriction())
+			glm::vec2 fricForce = (GetKineticFriction() + _actor2->GetKineticFriction()) / 2
+				/ ((1 / GetMass()) + (1 / _actor2->GetMass())) 
+				* PhysicsScene::GetGravity() 
+				* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 1 : normal.y / normal.x));
 
-			ApplyForce(-force, _contact - m_pos);
-			_actor2->ApplyForce(force, _contact - _actor2->m_pos);
-			
+			glm::vec2 totForce = force;
+
+			ApplyForce(-totForce, _contact - m_pos);
+			_actor2->ApplyForce(totForce, _contact - _actor2->m_pos);
 
 			if (collisionCallback != nullptr)
 				collisionCallback(_actor2);
@@ -157,7 +162,10 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 		float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 		if (kePost - kePre > kePost * 0.01f)
+		{
 			std::cout << "kinetic energy discrepancy\n";
+			std::cout << "kePre " << kePre << " kePost " << kePost << "\n";
+		}
 
 		if (_pen > 0)
 			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);
@@ -166,9 +174,12 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 float RigidBody::CalcKineticEnergy()
 {
-	glm::vec2 currVel = GetVel();
-	float vel = glm::sqrt(currVel.x * currVel.x + currVel.y * currVel.y);
-	return 0.5f * (GetMass() * glm::dot(m_vel, m_vel) + m_moment * m_angularVel * m_angularVel);
+	float kinEnergy = 0.5f * GetMass() * glm::dot(m_vel, m_vel);
+	float rotKinEnergy = 0.5f * GetMoment() * glm::dot(m_angularVel, m_angularVel);
+
+	//std::cout << kinEnergy << " " << rotKinEnergy << "\n";
+
+	return kinEnergy + rotKinEnergy;
 }
 
 float RigidBody::CalcPotentialEnergy()

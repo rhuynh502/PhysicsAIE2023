@@ -14,7 +14,7 @@
 //#define BoxOnPlane
 //#define BoxOnCircle
 //#define BounceToStop
-//#define SetPoolTable
+#define SetPoolTable
 //#define BouncePads
 //#define PhysicsBuckets
 //#define PachinkoTest
@@ -22,4 +22,4 @@
 //#define SoftBodyIntro
 //#define ObjectTest
 //#define Pachinko
-#define StaticFriction
+//#define StaticFriction
