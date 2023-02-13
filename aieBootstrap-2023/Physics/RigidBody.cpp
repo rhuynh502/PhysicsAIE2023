@@ -116,9 +116,9 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 	glm::vec2 perp(normal.y, -normal.x);
 
 	// determine the total velocity of the contact points for the two objects, 
-// for both linear and rotational 		
+	// for both linear and rotational 		
 
-		// 'r' is the radius from axis to application of force
+	// 'r' is the radius from axis to application of force
 	float r1 = glm::dot(_contact - GetPos(), -perp);
 	float r2 = glm::dot(_contact - _actor2->GetPos(), perp);
 	// velocity of the contact point on this object 
@@ -135,18 +135,20 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2;
 
-		float j = glm::dot(-(1 + elasticity) * (relativeVelocity), normal) /
-			glm::dot(normal, normal * ((1 / mass1) + (1 / mass2)));;
+		float j = -(1 + elasticity) * (v1 - v2) 
+			/ (glm::dot(normal, normal) * (1 / mass1 + 1 / mass2));
 
-		glm::vec2 fricForce = (GetKineticFriction() + _actor2->GetKineticFriction()) / 2
+		glm::vec2 fricForce = (GetStaticFriction() + _actor2->GetStaticFriction()) / 2
 			/ ((1 / GetMass()) + (1 / _actor2->GetMass()))
 			* PhysicsScene::GetGravity()
-			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 1 : normal.y / normal.x));
+			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 0 : normal.y / normal.x));
+		/*glm::vec2 fricForce = GetStaticFriction() * glm::dot(normal, PhysicsScene::GetGravity())
+			* glm::normalize(glm::vec2(-normal.y, normal.x)) * glm::cos(glm::atan(-normal.y / normal.x));*/
 
 		glm::vec2 force = ((1.0f + elasticity) * mass1 * mass2 /
 			(mass1 + mass2) * (v1 - v2) * normal) - fricForce;
 
-		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy() + glm::dot(fricForce, fricForce);
 
 		//apply equal and opposite forces
 		ApplyForce(-force, _contact - GetPos());
@@ -156,7 +158,7 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 		float deltaKE = kePost - kePre;
 		if (deltaKE > kePost * 0.01f)
-			std::cout << "Kinetic Energy discrepancy greater than 1% detected!!";
+			std::cout << "Kinetic Energy discrepancy greater than 1% detected!!\n";
 
 		if (_pen > 0)
 			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);

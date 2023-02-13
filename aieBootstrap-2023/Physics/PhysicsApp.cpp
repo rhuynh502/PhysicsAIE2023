@@ -431,16 +431,20 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->SetGravity(glm::vec2(0, -10));
 
 	Box* boxAngle = new Box(glm::vec2(0, 20), glm::vec2(0), 5, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
-	boxAngle->SetOrientation(DegreesToRadians(25));
+	boxAngle->SetOrientation(DegreesToRadians(20));
 	boxAngle->SetElasticity(0.5f);
 	Circle* circle3 = new Circle(glm::vec2(-20.3f, 20), glm::vec2(0), 5, 2, glm::vec4(1, 0, 1, 1));
 
-	Circle* circle1 = new Circle(glm::vec2(0, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
+	Circle* circle1 = new Circle(glm::vec2(-20, -20), glm::vec2(0), 5, 2, glm::vec4(1, 1, 1, 1));
 	circle1->SetKinematic(true);
 	circle1->SetKineticFriction(0.3f);
+	circle1->SetStaticFriction(0.4f);
 	circle1->SetElasticity(0.4f);
-	Box* circle2 = new Box(glm::vec2(-20, -20), glm::vec2(0), 5, 2, 2, glm::vec4(1, 1, 1, 1));
+	Box* circle2 = new Box(glm::vec2(0, -20), glm::vec2(0), 5, 2, 2, glm::vec4(1, 1, 1, 1));
 	circle2->SetKinematic(true);
+	circle2->SetKineticFriction(0.2f);
+	circle2->SetStaticFriction(0.3f);
+	circle2->SetOrientation(DegreesToRadians(120));
 	circle2->SetElasticity(0);
 
 
@@ -575,6 +579,8 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 		{
 			Circle* pin = new Circle(glm::vec2(-22.5f + (7 * j) + (3.5f * (i % 2)), 50 - (6 * i)), glm::vec2(0), 1, 1, glm::vec4(0, 1, 0, 1));
 			pin->SetKinematic(true);
+			pin->SetKineticFriction(0.2f);
+			pin->SetStaticFriction(0.4f);
 			pin->SetElasticity(0.25f);
 
 			m_physicsScene->AddActor(pin);
@@ -589,31 +595,43 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->SetGravity(glm::vec2(0, -10));
 
 	Plane* slope = new Plane(glm::normalize(glm::vec2(0.5f, 1.f)), 0);
-	slope->SetStaticFriction(0.8f);
-	slope->SetKineticFriction(0.8f);
-	Plane* floor = new Plane(glm::normalize(glm::vec2(0, 1)), -2);
-	floor->SetStaticFriction(0.2f);
-	floor->SetKineticFriction(0.8f);
+	slope->SetStaticFriction(0.9f);
+	slope->SetKineticFriction(0.7f);
+	Plane* floor = new Plane(glm::normalize(glm::vec2(0, 1)), 12);
+	floor->SetStaticFriction(0.9f);
+	floor->SetKineticFriction(0.7f);
 	Plane* slope1 = new Plane(glm::normalize(glm::vec2(-0.5f, 1)), -9);
-	slope1->SetStaticFriction(0.8f);
-	slope1->SetKineticFriction(0.8f);
+	slope1->SetStaticFriction(0.9f);
+	slope1->SetKineticFriction(0.7f);
 
 	Circle* ball = new Circle(glm::vec2(-25, 19), glm::vec2(0), 50, 3, glm::vec4(1, 0, 0, 1));
 	ball->SetStaticFriction(0.2f);
 	ball->SetKineticFriction(0.2f);
 	ball->SetElasticity(0.4f);
 
-	Box* box = new Box(glm::vec2(9, 18), glm::vec2(0), 50, 4, 4, glm::vec4(1, 0, 0, 1));
+	Box* box = new Box(glm::vec2(-25, 18), glm::vec2(0), 50, 4, 4, glm::vec4(1, 0, 0, 1));
 	box->SetStaticFriction(0.2f);
 	box->SetKineticFriction(0.2f);
 	box->SetElasticity(0.5f);
 
 	m_physicsScene->AddActor(slope);
 	m_physicsScene->AddActor(floor);
-	//m_physicsScene->AddActor(slope1);
-	m_physicsScene->AddActor(ball);
+	m_physicsScene->AddActor(slope1);
+	//m_physicsScene->AddActor(ball);
 	//m_physicsScene->AddActor(box);
 
+#endif
+
+#ifdef EffectiveMass
+	m_physicsScene->SetGravity(glm::vec2(0));
+
+	m_physicsScene->AddActor(new Box(glm::vec2(30, 30), glm::vec2(0), 10.f, 2.f, 8.f, glm::vec4(1, 0, 0, 1)));
+	m_physicsScene->AddActor(new Box(glm::vec2(30, 0), glm::vec2(0), 10.f, 2.f, 8.f, glm::vec4(1, 0, 0, 1)));
+	m_physicsScene->AddActor(new Box(glm::vec2(30, -30), glm::vec2(0), 10.f, 2.f, 8.f, glm::vec4(1, 0, 0, 1)));
+
+	m_physicsScene->AddActor(new Circle(glm::vec2(-30, 30), glm::vec2(40, 0), 1, 2, glm::vec4(1, 1, 0, 1)));
+	m_physicsScene->AddActor(new Circle(glm::vec2(-30, -2), glm::vec2(40, 0), 1, 2, glm::vec4(1, 1, 0, 1)));
+	m_physicsScene->AddActor(new Circle(glm::vec2(-30, -34), glm::vec2(40, 0), 1, 2, glm::vec4(1, 1, 0, 1)));
 #endif
 }
 

@@ -23,3 +23,4 @@
 //#define ObjectTest
 //#define Pachinko
 //#define StaticFriction
+//#define EffectiveMass

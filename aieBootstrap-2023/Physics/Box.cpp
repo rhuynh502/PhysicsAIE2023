@@ -13,7 +13,7 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 	m_width = _extents.x * 2;
 	m_height = _extents.y * 2;
 
-	m_moment = 1.0f / 3.0f * m_mass * m_width * m_height;
+	m_moment = 1.0f / 12.0f * m_mass * (m_width * m_width + m_height * m_height);
 
 	m_isKinematic = false;
 }
@@ -30,7 +30,7 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 
 	m_angularVel = 0;
 
-	m_moment = 1.0f / 12.0f * m_mass * m_width * m_height;
+	m_moment = 1.0f / 12.0f * m_mass * (m_width * m_width + m_height * m_height);
 
 	m_isKinematic = false;
 }
@@ -48,7 +48,7 @@ Box::Box(glm::vec2 _pos, glm::vec2 _vel,
 
 	m_angularVel = 0;
 
-	m_moment = 1.0f / 12.0f * m_mass * m_width * m_height;
+	m_moment = 1.0f / 12.0f * m_mass * (m_width * m_width + m_height * m_height);
 
 	m_isKinematic = false;
 }

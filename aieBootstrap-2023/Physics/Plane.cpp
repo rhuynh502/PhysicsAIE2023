@@ -65,60 +65,45 @@ void Plane::ResetPosition()
 
 void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 {
+	// the position at which we'll apply the force relative to the object's COM
 	glm::vec2 localContact = _contact - _actor->GetPos();
 
-	// plane is stationary -> relative velocity is just actor velocity at contact point
-	glm::vec2 velRel = _actor->GetVel() + _actor->GetAngularVel() * glm::vec2(-localContact.y, localContact.x);
-	float velIntoPlane = glm::dot(velRel, m_normal);
+	// the plane isn't moving, so the relative velocity is just actor2's velocity at the contact point
+	glm::vec2 vRel = _actor->GetVel() + _actor->GetAngularVel() * glm::vec2(-localContact.y, localContact.x);
+	float velocityIntoPlane = glm::dot(vRel, m_normal);
 
+	// perfectly elasticity collisions for now
 	float e = (GetElasticity() + _actor->GetElasticity()) / 2.0f;
 
+	// this is the perpendicular distance we apply the force at relative to the COM, so Torque = F*r
 	float r = glm::dot(localContact, glm::vec2(m_normal.y, -m_normal.x));
 
-	// this is the effective mass
+	// work out the "effective mass" - this is a combination of moment of
+	// inertia and mass, and tells us how much the contact point velocity 
+	// will change with the force we're applying
 	float mass0 = 1.0f / (1.0f / _actor->GetMass() + (r * r) / _actor->GetMoment());
 
-	float j = -(1 + e) * velIntoPlane * mass0;
+	float j = -(1 + e) * velocityIntoPlane * mass0;
 
-	glm::vec2 force = m_normal * j;
+	glm::vec2 fricForce = (GetStaticFriction() + _actor->GetKineticFriction()) / 2
+		/ (1 / _actor->GetMass())
+		* PhysicsScene::GetGravity()
+		* glm::cos(glm::atan(m_normal.y / m_normal.x));
+
+	glm::vec2 linearAccel = (_actor->GetMass() * PhysicsScene::GetGravity() * glm::sin(m_normal.y / m_normal.x) * _actor->GetMoment() / (_actor->GetMass() * localContact * localContact + _actor->GetMoment()));
+
+	glm::vec2 force = m_normal * j - fricForce;
 
 	float kePre = _actor->CalcKineticEnergy();
-	
-	/*float gradient = -m_normal.y / m_normal.x;
-	float forceParallel = std::abs(forceOnActor * glm::sin(gradient));
-	float forcePerpendicular = forceOnActor * glm::cos(gradient);
-	float forceNormal = m_staticFriction * forcePerpendicular;
-	float forceKinetic = m_kinecticFriction * forcePerpendicular;
-	float netForce = forceParallel - forceNormal;
-	float kineticForce = forceParallel - forceKinetic;*/
-	//direction of most amouynt of frictoin is rotation
 
-	// angular acceleration = 2/3r * g sin(theta) for a circle
-	// or frction / moment
-	// friction = coefficentkinecticfriction * m * g * cos(theta)
-
-	float theta = glm::tan(m_normal.y == 0 || m_normal.x == 0 ? 1 : -m_normal.x / m_normal.y);
-	glm::vec2 fricForce = _actor->GetKineticFriction() *
-		_actor->GetMass() * PhysicsScene::GetGravity() * 
-		glm::cos(theta);
-
-	float angularVel = _actor->GetAngularVel();
-	
-	glm::vec2 rotForce(angularVel * cos(theta), angularVel * sin(theta));
-
-	_actor->ApplyForce(force - fricForce - rotForce, _contact - _actor->GetPos());
-
-	if (_actor->collisionCallback)
-		_actor->collisionCallback(this);
+	_actor->ApplyForce(force, _contact - _actor->GetPos());
 
 	float pen = glm::dot(_contact, m_normal) - m_distanceToOrigin;
 	PhysicsScene::ApplyContactForces(_actor, nullptr, m_normal, pen);
 
 	float kePost = _actor->CalcKineticEnergy();
 
-	if (kePost - kePre > kePost * 0.01f)
-	{
-		std::cout << "Kinetic Energy discrepancy\n";
-		std::cout << "preKE " << kePre << " postKE " << kePost << "\n";
-	}
+	float deltaKE = kePost - kePre;
+	if (deltaKE > kePost * 0.01f)
+		std::cout << "Kinetic Energy discrepancy greater than 1% detected!!";
 }
