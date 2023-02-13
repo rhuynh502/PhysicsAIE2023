@@ -143,10 +143,20 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 			* PhysicsScene::GetGravity()
 			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 1 : normal.y / normal.x));
 
-		glm::vec2 force = (normal * j) - fricForce;
+		glm::vec2 force = ((1.0f + elasticity) * mass1 * mass2 /
+			(mass1 + mass2) * (v1 - v2) * normal) - fricForce;
+
+		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+
 		//apply equal and opposite forces
 		ApplyForce(-force, _contact - GetPos());
 		_actor2->ApplyForce(force, _contact - _actor2->GetPos());
+
+		float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
+
+		float deltaKE = kePost - kePre;
+		if (deltaKE > kePost * 0.01f)
+			std::cout << "Kinetic Energy discrepancy greater than 1% detected!!";
 
 		if (_pen > 0)
 			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);

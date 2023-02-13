@@ -16,8 +16,8 @@
 //#define BounceToStop
 //#define SetPoolTable
 //#define BouncePads
-//#define PhysicsBuckets
-#define PachinkoTest
+#define PhysicsBuckets
+//#define PachinkoTest
 //#define SpringIntro
 //#define SoftBodyIntro
 //#define ObjectTest
