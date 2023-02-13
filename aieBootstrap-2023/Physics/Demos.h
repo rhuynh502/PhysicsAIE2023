@@ -16,11 +16,11 @@
 //#define BounceToStop
 //#define SetPoolTable
 //#define BouncePads
-#define PhysicsBuckets
+//#define PhysicsBuckets
 //#define PachinkoTest
 //#define SpringIntro
 //#define SoftBodyIntro
 //#define ObjectTest
 //#define Pachinko
-//#define StaticFriction
+#define StaticFriction
 //#define EffectiveMass
