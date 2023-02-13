@@ -14,10 +14,10 @@
 //#define BoxOnPlane
 //#define BoxOnCircle
 //#define BounceToStop
-#define SetPoolTable
+//#define SetPoolTable
 //#define BouncePads
 //#define PhysicsBuckets
-//#define PachinkoTest
+#define PachinkoTest
 //#define SpringIntro
 //#define SoftBodyIntro
 //#define ObjectTest

@@ -68,10 +68,10 @@ void PhysicsApp::update(float deltaTime) {
 		glm::vec2 worldPos = ScreenToWorld(glm::vec2(xScreen, yScreen));
 
 		aie::Gizmos::add2DCircle(worldPos, 5, 32, glm::vec4(0, 0, 1, 1));
-		/*Circle* ball = new Circle(worldPos, glm::vec2(0), 5, 0.9f, glm::vec4(1, 0, 1, 1));
+		Circle* ball = new Circle(worldPos, glm::vec2(0), 5, 0.9f, glm::vec4(1, 0, 1, 1));
 		ball->SetElasticity(0.2f);
 		ball->SetKineticFriction(0.4f);
-		m_physicsScene->AddActor(ball);*/
+		m_physicsScene->AddActor(ball);
 	}
 
 #ifdef SimulatingRocket
@@ -229,7 +229,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 #ifdef CircleToCircleNewtons
 	m_physicsScene->SetGravity(glm::vec2(0));
 
-	Circle* ball1 = new Circle(glm::vec2(-30, 0), glm::vec2(6, 0), 5, 3, glm::vec4(1, 0, 1, 1));
+	Circle* ball1 = new Circle(glm::vec2(-30, 0), glm::vec2(15, 0), 5, 3, glm::vec4(1, 0, 1, 1));
 	Circle* ball2 = new Circle(glm::vec2(10, 0), glm::vec2(0, 0), 5, 3, glm::vec4(1, 0, 1, 1));
 
 	m_physicsScene->AddActor(ball1);
@@ -431,7 +431,7 @@ void PhysicsApp::DemoStartUp(int _demoNumber)
 	m_physicsScene->SetGravity(glm::vec2(0, -10));
 
 	Box* boxAngle = new Box(glm::vec2(0, 20), glm::vec2(0), 5, glm::vec2(2, 2), glm::vec4(1, 0, 1, 1));
-	boxAngle->SetOrientation(DegreesToRadians(30));
+	boxAngle->SetOrientation(DegreesToRadians(25));
 	boxAngle->SetElasticity(0.5f);
 	Circle* circle3 = new Circle(glm::vec2(-20.3f, 20), glm::vec2(0), 5, 2, glm::vec4(1, 0, 1, 1));
 

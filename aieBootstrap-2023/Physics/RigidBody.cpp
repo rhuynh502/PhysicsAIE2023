@@ -105,67 +105,48 @@ void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 
 void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm, float _pen)
 {
-	m_objectsInsideThisFrame.push_back(_actor2);
-	_actor2->m_objectsInsideThisFrame.push_back(this);
+	// find the vector between their centres, or use the provided direction
+	// of force, and make sure it's normalised
+	glm::vec2 normal = glm::normalize(_collisionNorm ? *_collisionNorm :
+		_actor2->GetPos() - GetPos());
 
-	// find vec normal or use provided one
-	glm::vec2 normal = glm::normalize(_collisionNorm ? *_collisionNorm : _actor2->GetPos() - m_pos);
-	glm::vec2 relVel = _actor2->GetVel() - m_vel;
+	glm::vec2 relativeVelocity = _actor2->GetVel() - GetVel();
+
+	// get the vector perpendicular to the collision normal
 	glm::vec2 perp(normal.y, -normal.x);
-	
-	float r1 = glm::dot(_contact - m_pos, -perp);
-	float r2 = glm::dot(_contact - _actor2->m_pos, perp);
 
-	float v1 = glm::dot(m_vel, normal) - r1 * GetAngularVel();
-	float v2 = glm::dot(_actor2->m_vel, normal) + r2 * _actor2->GetAngularVel();
+	// determine the total velocity of the contact points for the two objects, 
+// for both linear and rotational 		
 
-	if (v1 > v2) // moving closer
+		// 'r' is the radius from axis to application of force
+	float r1 = glm::dot(_contact - GetPos(), -perp);
+	float r2 = glm::dot(_contact - _actor2->GetPos(), perp);
+	// velocity of the contact point on this object 
+	float v1 = glm::dot(GetVel(), normal) - r1 * GetAngularVel();
+	// velocity of contact point on actor2
+	float v2 = glm::dot(_actor2->GetVel(), normal) +
+		r2 * _actor2->GetAngularVel();
+	if (v1 > v2) // they're moving closer
 	{
+		// calculate the effective mass at contact point for each object
+		// ie how much the contact point will move due to the force applied.
 		float mass1 = 1.0f / (1.0f / GetMass() + (r1 * r1) / GetMoment());
 		float mass2 = 1.0f / (1.0f / _actor2->GetMass() + (r2 * r2) / _actor2->GetMoment());
 
-		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2.0f;
+		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2;
 
-		float j = glm::dot(-(1 + elasticity) * (relVel), normal) /
-			glm::dot(normal, normal * ((1 / GetMass()) + (1 / _actor2->GetMass())));
+		float j = glm::dot(-(1 + elasticity) * (relativeVelocity), normal) /
+			glm::dot(normal, normal * ((1 / mass1) + (1 / mass2)));;
 
-		// glm::dot(-(1 + elasticity) * (relVel), normal) /
-		// glm::dot(((_contact - m_pos) * normal) * (_contact - m_pos) / GetMoment() + ((_contact - _actor2->m_pos) * normal) * (_contact - _actor2->m_pos) / _actor2->GetMoment(), normal) + ((1 / GetMass()) + (1 / _actor2->GetMass()));
+		glm::vec2 fricForce = (GetKineticFriction() + _actor2->GetKineticFriction()) / 2
+			/ ((1 / GetMass()) + (1 / _actor2->GetMass()))
+			* PhysicsScene::GetGravity()
+			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 1 : normal.y / normal.x));
 
-		glm::vec2 force = normal * j;
-
-		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
-
-		if (!m_isTrigger && !_actor2->m_isTrigger)
-		{
-			// (GetKineticFriction() >= _actor2->GetKineticFriction() ? GetKineticFriction() : _actor2->GetKineticFriction())
-			glm::vec2 fricForce = (GetKineticFriction() + _actor2->GetKineticFriction()) / 2
-				/ ((1 / GetMass()) + (1 / _actor2->GetMass())) 
-				* PhysicsScene::GetGravity() 
-				* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 1 : normal.y / normal.x));
-
-			glm::vec2 totForce = force;
-
-			ApplyForce(-totForce, _contact - m_pos);
-			_actor2->ApplyForce(totForce, _contact - _actor2->m_pos);
-
-			if (collisionCallback != nullptr)
-				collisionCallback(_actor2);
-			if (_actor2->collisionCallback)
-				_actor2->collisionCallback(this);
-		}
-		else
-		{
-			TriggerEnter(_actor2);
-			_actor2->TriggerEnter(this);
-		}
-
-		float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
-		if (kePost - kePre > kePost * 0.01f)
-		{
-			std::cout << "kinetic energy discrepancy\n";
-			std::cout << "kePre " << kePre << " kePost " << kePost << "\n";
-		}
+		glm::vec2 force = (normal * j) - fricForce;
+		//apply equal and opposite forces
+		ApplyForce(-force, _contact - GetPos());
+		_actor2->ApplyForce(force, _contact - _actor2->GetPos());
 
 		if (_pen > 0)
 			PhysicsScene::ApplyContactForces(this, _actor2, normal, _pen);
