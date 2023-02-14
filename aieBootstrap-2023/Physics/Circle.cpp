@@ -18,10 +18,11 @@ void Circle::Draw(float _alpha)
 {
 	CalculateSmoothedPosition(_alpha);
 
-	aie::Gizmos::add2DCircle(m_smoothedPosition, m_radius, 25, m_color);
+	aie::Gizmos::add2DCircle(m_smoothedPosition, m_radius, 10, m_color);
 
-	aie::Gizmos::add2DLine(m_smoothedPosition, m_smoothedPosition + m_smoothedLocalX * m_radius,
-		glm::vec4(1, 1, 1, 1));
+	if(!IsKinematic())
+		aie::Gizmos::add2DLine(m_smoothedPosition, m_smoothedPosition + m_smoothedLocalX * m_radius,
+			glm::vec4(1, 1, 1, 1));
 
 }
 

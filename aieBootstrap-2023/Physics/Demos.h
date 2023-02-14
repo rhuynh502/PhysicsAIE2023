@@ -1,6 +1,6 @@
 #pragma once
 
-#define PI 3.14159265359
+#define PI 3.14159265359f
 
 //#define NewtonsFirstLaw
 //#define NewtonsSecondLaw
@@ -21,6 +21,6 @@
 //#define SpringIntro
 //#define SoftBodyIntro
 //#define ObjectTest
-//#define Pachinko
-#define StaticFriction
+#define Pachinko
+//#define StaticFriction
 //#define EffectiveMass

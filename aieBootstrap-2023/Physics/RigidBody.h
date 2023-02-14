@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <functional>
 #include <list>
+#include <tuple>
 
 class RigidBody : public PhysicsObject
 {
@@ -59,6 +60,7 @@ public:
 	void SetOrientation(float _orientation) { m_orientation = _orientation; }
 	void SetAngularVel(float _angularVel) { m_angularVel = _angularVel; }
 	void SetMoment(float _moment) { m_moment = _moment; }
+	void SetRotate(bool _rotating) { m_canRotate = _rotating; }
 
 	void SetColor(glm::vec4 _color) { m_color = _color; }
 
@@ -74,6 +76,7 @@ public:
 	std::function<void(PhysicsObject*)> triggerEnter;
 	std::function<void(PhysicsObject*)> triggerExit;
 
+	std::list<std::tuple<RigidBody*, glm::vec2, float>> objectsContact;
 protected:
 	glm::vec2 m_pos;
 	glm::vec2 m_vel;
@@ -98,11 +101,13 @@ protected:
 	float m_angularDrag;
 
 	bool m_isKinematic;
+	bool m_canRotate;
 
 	glm::vec2 m_worldSmooth;
 
 	bool m_isTrigger;
 	std::list<PhysicsObject*> m_objectsInside;
 	std::list<PhysicsObject*> m_objectsInsideThisFrame;
+
 };
 

@@ -5,8 +5,6 @@
 #include "PhysicsObject.h"
 #include "RigidBody.h"
 
-class PhysicsObject;
-
 class PhysicsScene
 {
 	static glm::vec2 m_gravity;
@@ -33,6 +31,7 @@ public:
 
 	void CheckForCollision();
 	float GetTotalEnergy();
+
 	static void ApplyContactForces(RigidBody* _body1, RigidBody* _body2, glm::vec2 _norm, float _pen);
 
 	static bool Plane2Plane(PhysicsObject* _obj1, PhysicsObject* _obj2);

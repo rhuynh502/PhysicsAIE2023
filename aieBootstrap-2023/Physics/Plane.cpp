@@ -94,7 +94,7 @@ void Plane::ResolveCollision(RigidBody* _actor, glm::vec2 _contact)
 
 	glm::vec2 force = m_normal * j - fricForce;
 
-	float kePre = _actor->CalcKineticEnergy();
+	float kePre = _actor->CalcKineticEnergy() + glm::dot(fricForce, fricForce);
 
 	_actor->ApplyForce(force, _contact - _actor->GetPos());
 

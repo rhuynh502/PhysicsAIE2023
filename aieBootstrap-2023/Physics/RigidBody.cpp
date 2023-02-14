@@ -1,9 +1,9 @@
 #include "RigidBody.h"
 #include <iostream>
-#include "glm/glm.hpp"
 #include "PhysicsScene.h"
+#include "Demos.h"
 
-#define MIN_LINEAR_THRESHOLD 0.09970000001f
+#define MIN_LINEAR_THRESHOLD 0.0998f
 #define MIN_ANGULAR_THRESHOLD 0.03f
 
 RigidBody::RigidBody()
@@ -12,6 +12,7 @@ RigidBody::RigidBody()
 	m_isKinematic = false;
 	m_staticFriction = 0;
 	m_kinecticFriction = 0;
+	m_canRotate = false;
 }
 
 RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _orientation, float _mass, glm::vec4 _color = glm::vec4(0, 0, 0, 0))
@@ -30,6 +31,7 @@ RigidBody::RigidBody(ShapeType _shapeID, glm::vec2 _pos, glm::vec2 _vel, float _
 	m_isTrigger = false;
 	m_staticFriction = 0;
 	m_kinecticFriction = 0;
+	m_canRotate = false;
 }
 
 RigidBody::~RigidBody()
@@ -43,7 +45,8 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 	if (m_isKinematic)
 	{
 		m_vel = glm::vec2(0);
-		m_angularVel = 0;
+		if(!m_canRotate)
+			m_angularVel = 0;
 		return;
 	}
 
@@ -64,15 +67,6 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 
 	m_objectsInsideThisFrame.clear();
 
-	if (glm::length(m_vel) < MIN_LINEAR_THRESHOLD)
-	{
-		m_vel = glm::vec2(0, 0);
-	}
-
-	if (glm::length(m_angularVel) < MIN_ANGULAR_THRESHOLD)
-	{
-		m_angularVel = 0;
-	}
 
 	m_lastPos = m_pos;
 	m_lastOrientation = m_orientation;
@@ -82,6 +76,16 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 	ApplyForce(_gravity * GetMass() * _timeStep, glm::vec2(0));
 
 	m_orientation += m_angularVel * _timeStep;
+
+	if (glm::length(m_vel) < MIN_LINEAR_THRESHOLD)
+	{
+		m_vel = glm::vec2(0, 0);
+	}
+
+	if (glm::length(m_angularVel) < MIN_ANGULAR_THRESHOLD)
+	{
+		m_angularVel = 0;
+	}
 
 	m_vel -= m_vel * m_linearDrag * _timeStep;
 	m_angularVel -= m_angularVel * m_angularDrag * _timeStep;
@@ -96,12 +100,6 @@ void RigidBody::ApplyForce(glm::vec2 _force, glm::vec2 _pos)
 
 	m_angularVel += totForce / GetMoment();
 }
-
-//void RigidBody::ApplyForceToActor(RigidBody* _actorOther, glm::vec2 _force)
-//{
-//	ApplyForce(-_force);
-//	_actorOther->ApplyForce(_force);
-//}
 
 void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::vec2* _collisionNorm, float _pen)
 {
@@ -138,15 +136,17 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 		float j = -(1 + elasticity) * (v1 - v2) 
 			/ (glm::dot(normal, normal) * (1 / mass1 + 1 / mass2));
 
+		float cosineZero = 90.f * PI / 180.0f;
+		
+
+
 		glm::vec2 fricForce = (GetStaticFriction() + _actor2->GetStaticFriction()) / 2
 			/ ((1 / GetMass()) + (1 / _actor2->GetMass()))
 			* PhysicsScene::GetGravity()
 			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 0 : normal.y / normal.x));
-		/*glm::vec2 fricForce = GetStaticFriction() * glm::dot(normal, PhysicsScene::GetGravity())
-			* glm::normalize(glm::vec2(-normal.y, normal.x)) * glm::cos(glm::atan(-normal.y / normal.x));*/
 
 		glm::vec2 force = ((1.0f + elasticity) * mass1 * mass2 /
-			(mass1 + mass2) * (v1 - v2) * normal) - fricForce;
+			(mass1 + mass2) * (v1 - v2) * normal);
 
 		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy() + glm::dot(fricForce, fricForce);
 
