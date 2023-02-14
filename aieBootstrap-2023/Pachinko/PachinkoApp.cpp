@@ -73,7 +73,7 @@ bool PachinkoApp::startup() {
 		{
 			for (int k = j % 2 ? 11 : 12; k > 0; k--)
 			{
-				Circle* pin = new Circle(glm::vec2((70 * i) + (-5 * i * k) + (2 * (j % 2)), 80 - (4 * j)), glm::vec2(0), 1, 0.8f, glm::vec4(1, 1, 1, 1));
+				Circle* pin = new Circle(glm::vec2((90 * i) + (-7 * i * k) + (-2 * (j % 2) * i), 100 - (4 * j)), glm::vec2(0), 1, 0.8f, glm::vec4(1, 1, 1, 1));
 				pin->SetKinematic(true);
 				pin->SetStaticFriction(0.3299f);
 				pin->SetKineticFriction(0.2677f);

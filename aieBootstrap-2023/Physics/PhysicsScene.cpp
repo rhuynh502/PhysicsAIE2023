@@ -101,6 +101,11 @@ void PhysicsScene::CheckForCollision()
 			if (shapeId1 < 0 || shapeId2 < 0)
 				continue;
 
+			RigidBody* obj1Body = dynamic_cast<RigidBody*>(obj1);
+			RigidBody* obj2Body = dynamic_cast<RigidBody*>(obj2);
+
+			if (obj1Body && obj2Body && obj1Body->IsKinematic() && obj2Body->IsKinematic())
+				continue;
 			// Use function pointers
 			int fnIndex = (shapeId1 * SHAPE_COUNT) + shapeId2;
 			fn collisionFunctionPtr = collisionFunctionArray[fnIndex];
