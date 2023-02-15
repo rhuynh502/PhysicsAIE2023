@@ -21,6 +21,6 @@
 //#define SpringIntro
 //#define SoftBodyIntro
 //#define ObjectTest
-#define Pachinko
+//#define Pachinko
 //#define StaticFriction
 //#define EffectiveMass

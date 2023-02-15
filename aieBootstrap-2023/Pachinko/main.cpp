@@ -6,7 +6,7 @@ int main() {
 	auto app = new PachinkoApp();
 
 	// initialise and loop
-	app->run("AIE", 540, 960, false);
+	app->run("Pachinko: Gamba Simulator", 540, 960, false);
 
 	// deallocation
 	delete app;

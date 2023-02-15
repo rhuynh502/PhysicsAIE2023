@@ -14,6 +14,7 @@ public:
 
 	void AddActor(PhysicsObject* _actor);
 	void RemoveActor(PhysicsObject* _actor);
+	void AddToRemove(PhysicsObject* _actor);
 	
 	void Update(float _dt);
 	void Draw();
@@ -48,5 +49,6 @@ protected:
 	float m_timeStep;
 
 	std::vector<PhysicsObject*> m_actors;
+	std::vector<PhysicsObject*> m_actorsToRemove;
 };
 

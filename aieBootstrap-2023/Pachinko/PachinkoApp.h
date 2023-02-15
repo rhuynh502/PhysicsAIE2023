@@ -2,12 +2,11 @@
 
 #include "Application.h"
 #include "Renderer2D.h"
-//#include "PhysicsScene.h"
+#include "PhysicsScene.h"
 #include "PhysicsObject.h"
 #include <glm/glm.hpp>
 #include <vector>
 
-class PhysicsScene;
 
 class PachinkoApp : public aie::Application {
 public:
@@ -39,5 +38,8 @@ public:
 
 	float m_cameraX;
 	float m_cameraY;
+
+	float m_totPoints;
+	float m_pointBet;
 	
 };

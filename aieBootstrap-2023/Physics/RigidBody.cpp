@@ -3,7 +3,7 @@
 #include "PhysicsScene.h"
 #include "Demos.h"
 
-#define MIN_LINEAR_THRESHOLD 0.0998f
+#define MIN_LINEAR_THRESHOLD 0.0997f
 #define MIN_ANGULAR_THRESHOLD 0.03f
 
 RigidBody::RigidBody()
@@ -42,14 +42,6 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 {
 	CalculateAxes();
 
-	if (m_isKinematic)
-	{
-		m_vel = glm::vec2(0);
-		if(!m_canRotate)
-			m_angularVel = 0;
-		return;
-	}
-
 	if (m_isTrigger)
 	{
 		for (auto it = m_objectsInside.begin(); it != m_objectsInside.end(); it++)
@@ -63,6 +55,14 @@ void RigidBody::FixedUpdate(glm::vec2 _gravity, float _timeStep)
 					break;
 			}
 		}
+	}
+
+	if (m_isKinematic)
+	{
+		m_vel = glm::vec2(0);
+		if(!m_canRotate)
+			m_angularVel = 0;
+		return;
 	}
 
 	m_objectsInsideThisFrame.clear();
@@ -133,26 +133,27 @@ void RigidBody::ResolveCollision(RigidBody* _actor2, glm::vec2 _contact, glm::ve
 
 		float elasticity = (GetElasticity() + _actor2->GetElasticity()) / 2;
 
-		float j = -(1 + elasticity) * (v1 - v2) 
-			/ (glm::dot(normal, normal) * (1 / mass1 + 1 / mass2));
-
-		float cosineZero = 90.f * PI / 180.0f;
-		
-
-
-		glm::vec2 fricForce = (GetStaticFriction() + _actor2->GetStaticFriction()) / 2
-			/ ((1 / GetMass()) + (1 / _actor2->GetMass()))
-			* PhysicsScene::GetGravity()
-			* glm::cos(glm::atan(normal.y == 0 || normal.x == 0 ? 0 : normal.y / normal.x));
-
 		glm::vec2 force = ((1.0f + elasticity) * mass1 * mass2 /
 			(mass1 + mass2) * (v1 - v2) * normal);
 
-		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy() + glm::dot(fricForce, fricForce);
+		float kePre = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 
-		//apply equal and opposite forces
-		ApplyForce(-force, _contact - GetPos());
-		_actor2->ApplyForce(force, _contact - _actor2->GetPos());
+		if (!m_isTrigger && !_actor2->m_isTrigger)
+		{
+			//apply equal and opposite forces
+			ApplyForce(-force, _contact - GetPos());
+			_actor2->ApplyForce(force, _contact - _actor2->GetPos());
+
+			if (collisionCallback != nullptr)
+				collisionCallback(_actor2);
+			if (_actor2->collisionCallback != nullptr)
+				collisionCallback(this);
+		}
+		else
+		{
+			TriggerEnter(_actor2);
+			_actor2->TriggerEnter(this);
+		}
 
 		float kePost = CalcKineticEnergy() + _actor2->CalcKineticEnergy();
 

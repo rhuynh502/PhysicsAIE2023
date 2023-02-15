@@ -47,11 +47,17 @@ void PhysicsScene::RemoveActor(PhysicsObject* _actor)
 	if (found != m_actors.end())
 	{
 		m_actors.erase(found);
+		//std::remove(m_actors.begin(), m_actors.end(), _actor);
 	}
 
 	// **std::remove** is a better time complexity than vector::erase
 	// goes from O(n^2) -> O(n)
 	//std::remove(m_actors.begin(), m_actors.end(), _actor);
+}
+
+void PhysicsScene::AddToRemove(PhysicsObject* _actor)
+{
+	m_actorsToRemove.push_back(_actor);
 }
 
 void PhysicsScene::Update(float _dt)
@@ -66,6 +72,13 @@ void PhysicsScene::Update(float _dt)
 		{
 			pActor->FixedUpdate(m_gravity, m_timeStep);
 		}
+
+		for (auto pActor : m_actorsToRemove)
+		{
+			RemoveActor(pActor);
+		}
+		m_actorsToRemove.clear();
+
 		accumulatedTime -= m_timeStep;
 
 
@@ -104,7 +117,9 @@ void PhysicsScene::CheckForCollision()
 			RigidBody* obj1Body = dynamic_cast<RigidBody*>(obj1);
 			RigidBody* obj2Body = dynamic_cast<RigidBody*>(obj2);
 
-			if (obj1Body && obj2Body && obj1Body->IsKinematic() && obj2Body->IsKinematic())
+			if (obj1Body && obj2Body 
+				&& (obj1Body->IsKinematic() && obj2Body->IsKinematic()) 
+				|| (obj1Body->GetTrigger() && obj2Body->GetTrigger()))
 				continue;
 			// Use function pointers
 			int fnIndex = (shapeId1 * SHAPE_COUNT) + shapeId2;
