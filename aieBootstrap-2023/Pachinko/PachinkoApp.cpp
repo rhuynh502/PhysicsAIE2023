@@ -20,13 +20,14 @@ PachinkoApp::PachinkoApp() {
 	m_pointBet = 1;
 }
 
-PachinkoApp::~PachinkoApp() {
+PachinkoApp::~PachinkoApp() 
+{
 
 }
 
 bool PachinkoApp::startup() {
 	
-	aie::Gizmos::create(450U, 450U, 65535U, 65535U);
+	aie::Gizmos::create(8000U, 8000U, 8000U, 8000U);
 
 	m_2dRenderer = new aie::Renderer2D();
 
